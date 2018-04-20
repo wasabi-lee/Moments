@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/image_detail_delete"
+        android:icon="@drawable/ic_action_cancel_black"
+        android:title="Delete"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/image_detail_crop"
+        android:icon="@drawable/ic_crop_black"
+        android:title="Crop"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/image_detail_new_image"
+        android:icon="@drawable/ic_add_a_photo_black"
+        android:title="Change Image"
+        app:showAsAction="always" />
+</menu>

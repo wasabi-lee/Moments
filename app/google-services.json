@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "895605388970",
+    "firebase_url": "https://moments-7c4c1.firebaseio.com",
+    "project_id": "moments-7c4c1",
+    "storage_bucket": "moments-7c4c1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895605388970:android:496b43fcfd985d81",
+        "android_client_info": {
+          "package_name": "com.wasabilee.moments"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "895605388970-vmd8li75cv7r5rmujpabgmtpisovchfm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wasabilee.moments",
+            "certificate_hash": "67e291a5973eb1bc73acf8896207b1032e103510"
+          }
+        },
+        {
+          "client_id": "895605388970-mm5g7nbmieflj1bqu7s1qfh1s36otgv6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtBMw81ePERj96tMbDW8LkiJw2NS86TRU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "895605388970-mm5g7nbmieflj1bqu7s1qfh1s36otgv6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

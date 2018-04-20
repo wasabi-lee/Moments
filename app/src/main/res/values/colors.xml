@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary_light">#ebebeb</color>
+    <color name="colorPrimaryDark_light">#e0e0e0</color>
+    <color name="colorAccent_light">#bdbdbd</color>
+    <color name="text_light">#000000</color>
+    <color name="window_default_background_light">#eeeeee</color>
+    <color name="window_default_night_background_light">#e0e0e0</color>
+    <color name="window_dark_background_light">#e0e0e0</color>
+    <color name="button_light">#ffffff</color>
+
+    <color name="colorPrimary_dark">#757575</color>
+    <color name="colorPrimaryDark_dark">#494949</color>
+    <color name="colorAccent_dark">#bdbdbd</color>
+    <color name="text_dark">#ffffff</color>
+    <color name="window_background_dark">#757575</color>
+    <color name="window_default_background_dark">#757575</color>
+    <color name="window_default_night_background_dark">#757575</color>
+    <color name="window_dark_background_dark">#494949</color>
+
+    <color name="page_indicator_selected">#787878</color>
+    <color name="page_indicator_unselected">#cccccc</color>
+
+    <color name="blank_image_background">#e0e0e0</color>
+    <color name="blank_image_night_background">#ececec</color>
+    <color name="blank_image_text">#aaaaaa</color>
+
+    <color name="circle_icon_background">#111524</color>
+
+
+
+
+</resources>

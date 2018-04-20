@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewmodel"
+            type="com.wasabilee.moments.ViewModel.EditViewModel" />
+    </data>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/window_default_night_background_light"
+        tools:context=".Fragment.EditNightFragment">
+
+        <!-- TODO: Update blank fragment layout -->
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:isScrollContainer="true">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:id="@+id/edit_night_dummy_box_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/edit_night_date_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_dummy_box_1"
+                    android:text="@{viewmodel.mDate}" />
+
+                <ImageView
+                    android:id="@+id/edit_night_journal_image"
+                    android:layout_width="0dp"
+                    android:layout_height="250dp"
+                    android:visibility="@{viewmodel.isNightImageLoaded ? View.VISIBLE : View.GONE}"
+                    android:background="@color/blank_image_background"
+                    app:mNightImageUri="@{viewmodel.mNightImageUri}"
+                    app:layout_constraintTop_toBottomOf="@id/edit_night_journal_no_image_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/edit_night_journal_no_image_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/blank_image_night_background"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:text="@string/no_image_text"
+                    android:textColor="@color/blank_image_text"
+                    android:visibility="@{viewmodel.isNightImageLoaded ? View.GONE : View.VISIBLE}"
+                    app:layout_constraintEnd_toEndOf="@+id/edit_night_journal_image"
+                    app:layout_constraintStart_toStartOf="@+id/edit_night_journal_image"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_date_text" />
+
+                <TextView
+                    android:id="@+id/edit_night_amazing_header_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/roboto_condensed_bold"
+                    android:padding="8dp"
+                    android:text="@string/journal_header_amazing_things"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_journal_image" />
+
+                <TextView
+                    android:id="@+id/edit_night_amazing_dummy_number_text_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/journal_item_number_1"
+                    app:layout_constraintBottom_toTopOf="@+id/edit_night_amazing_edit_2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/edit_night_amazing_edit_1" />
+
+                <EditText
+                    android:id="@+id/edit_night_amazing_edit_1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginRight="24dp"
+                    android:inputType="text"
+                    android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_4_item_1}"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/edit_night_amazing_dummy_number_text_1"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_amazing_header_text" />
+
+                <TextView
+                    android:id="@+id/edit_night_amazing_dummy_number_text_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/journal_item_number_2"
+                    app:layout_constraintBottom_toBottomOf="@+id/edit_night_amazing_edit_2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/edit_night_amazing_edit_2" />
+
+                <EditText
+                    android:id="@+id/edit_night_amazing_edit_2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginRight="24dp"
+                    android:inputType="text"
+                    android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_4_item_2}"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/edit_night_amazing_dummy_number_text_1"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_amazing_edit_1" />
+
+                <TextView
+                    android:id="@+id/edit_night_amazing_dummy_number_text_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/journal_item_number_3"
+                    app:layout_constraintBottom_toBottomOf="@+id/edit_night_amazing_edit_3"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/edit_night_amazing_edit_3" />
+
+                <EditText
+                    android:id="@+id/edit_night_amazing_edit_3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginRight="24dp"
+                    android:inputType="text"
+                    android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_4_item_3}"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/edit_night_amazing_dummy_number_text_3"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_amazing_edit_2" />
+
+                <TextView
+                    android:id="@+id/edit_night_better_header_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/roboto_condensed_bold"
+                    android:padding="8dp"
+                    android:text="@string/journal_header_better"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_amazing_edit_3" />
+
+                <TextView
+                    android:id="@+id/edit_night_better_dummy_number_text_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/journal_item_number_1"
+                    app:layout_constraintBottom_toBottomOf="@+id/edit_night_better_edit_1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/edit_night_better_edit_1" />
+
+                <EditText
+                    android:id="@+id/edit_night_better_edit_1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginRight="24dp"
+                    android:inputType="text"
+                    android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_5_item_1}"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/edit_night_better_dummy_number_text_1"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_better_header_text" />
+
+                <TextView
+                    android:id="@+id/edit_night_better_dummy_number_text_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/journal_item_number_2"
+                    app:layout_constraintBottom_toBottomOf="@+id/edit_night_better_edit_2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/edit_night_better_edit_2" />
+
+                <EditText
+                    android:id="@+id/edit_night_better_edit_2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginRight="24dp"
+                    android:inputType="text"
+                    android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_5_item_2}"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/edit_night_better_dummy_number_text_1"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_better_edit_1" />
+
+                <TextView
+                    android:id="@+id/edit_night_better_dummy_number_text_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/journal_item_number_3"
+                    app:layout_constraintBottom_toBottomOf="@+id/edit_night_better_edit_3"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/edit_night_better_edit_3" />
+
+                <EditText
+                    android:id="@+id/edit_night_better_edit_3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginRight="24dp"
+                    android:inputType="text"
+                    android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_5_item_3}"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/edit_night_better_dummy_number_text_3"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_night_better_edit_2" />
+
+
+                <View
+                    android:id="@+id/edit_night_dummy_box_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@color/window_default_night_background_light"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/edit_night_better_edit_3" />
+
+
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+    </FrameLayout>
+</layout>

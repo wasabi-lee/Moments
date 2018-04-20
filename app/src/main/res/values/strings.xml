@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Moments.</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="sign_in_text">Sign In</string>
+    <string name="or_text">or</string>
+    <string name="need_account_text">Need an account?</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="register_text">Register</string>
+    <string name="account_exists_text">Already have an account?</string>
+
+    <string name="error_login_empty_input">Please enter your email / password</string>
+    <string name="error_signin_failure">Something went wrong! Please try again later :(</string>
+    <string name="error_password_confirm_mismatch">The passwords don\'t match!</string>
+    <string name="setup_welcom_to">Welcome to</string>
+    <string name="setup_name_question">Please tell me your name</string>
+    <string name="hint_username">Username</string>
+    <string name="get_started">Get Started</string>
+    <string name="add_new_post">Add A New Post</string>
+    <string name="logout">Logout</string>
+    <string name="settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="journal_item_number_1">1.</string>
+    <string name="journal_item_number_2">2.</string>
+    <string name="journal_item_number_3">3.</string>
+    <string name="journal_header_grateful">I AM GRATEFUL FOR</string>
+    <string name="no_image_text">Click here to add an image</string>
+    <string name="journal_header_better">WHAT COULD MAKE TODAY BETTER?</string>
+    <string name="journal_header_amazing_things">3 AMAZING THINGS HAPPENED TODAY</string>
+    <string name="journal_header_todo">WHAT WILL MAKE\ TODAY AMAZING?</string>
+    <string name="journal_header_affirmations">AFFIRMATIONS</string>
+    <string name="unexpected_error">Unexpected error occurred. Please try again later!</string>
+    <string name="image_load_finished">Image loaded</string>
+
+</resources>
