@@ -22,6 +22,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.wasabilee.moments.Utils.ActivityNavigator;
 import com.wasabilee.moments.Utils.JournalNavigator;
+import com.wasabilee.moments.Utils.ViewModelFactory;
 import com.wasabilee.moments.ViewModel.MainViewModel;
 import com.wasabilee.moments.R;
 import com.wasabilee.moments.Utils.SnackbarUtils;
@@ -85,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements JournalNavigator 
     }
 
     private MainViewModel obtainViewModel(FragmentActivity activity) {
-        return ViewModelProviders.of(activity).get(MainViewModel.class);
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+        return ViewModelProviders.of(activity, factory).get(MainViewModel.class);
     }
 
     private void setupObservers() {

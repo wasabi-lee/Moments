@@ -1,13 +1,13 @@
 package com.wasabilee.moments.Fragment;
 
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +20,6 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.wasabilee.moments.Activitiy.EditActivity;
 import com.wasabilee.moments.Activitiy.ImageDetailActivity;
-import com.wasabilee.moments.Utils.ActivityNavigator;
 import com.wasabilee.moments.ViewModel.EditViewModel;
 import com.wasabilee.moments.R;
 import com.wasabilee.moments.Utils.SnackbarUtils;
@@ -36,9 +35,7 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
 
     private static final String TAG = EditNightFragment.class.getSimpleName();
 
-    private static final int NIGHT_IMAGE_DETAIL_REQUEST_CODE = 23;
     public static final String JOURNAL_TIME_IDENTIFIER_NIGHT = "night_journal";
-
 
     @BindView(R.id.edit_night_date_text)
     TextView mDateText;
@@ -82,7 +79,6 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
         mViewModel.start();
         setupCalendar();
         setupImageView();
-        setupSnackbar();
         setupActivityTransitionObservers();
 
     }
@@ -107,34 +103,18 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
         });
     }
 
-    private void setupSnackbar() {
-        mViewModel.getSnackbarText().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(@Nullable Integer integer) {
-                showSnackbar(getString(integer));
-            }
-        });
-    }
 
     private void setupActivityTransitionObservers() {
-        mViewModel.getNightActivityChangeLiveData().observe(this, new Observer<ActivityNavigator>() {
-            @Override
-            public void onChanged(@Nullable ActivityNavigator activityNavigator) {
-                if (activityNavigator != null)
-                switch (activityNavigator) {
-                    case NEW_IMAGE:
-                        toCropImageActivity();
-                        break;
-                }
+        mViewModel.getNightActivityChangeLiveData().observe(this, activityNavigator -> {
+            if (activityNavigator != null)
+            switch (activityNavigator) {
+                case NEW_IMAGE:
+                    toCropImageActivity();
+                    break;
             }
         });
 
-        mViewModel.getNightImageDetailOpeningEvent().observe(this, new Observer<Uri>() {
-            @Override
-            public void onChanged(@Nullable Uri uri) {
-                toImageDetailActivity(uri);
-            }
-        });
+        mViewModel.getNightImageDetailOpeningEvent().observe(this, this::toImageDetailActivity);
     }
 
     private void showDatePicker() {
@@ -170,7 +150,8 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
     private void toImageDetailActivity(Uri uri) {
         Intent intent = new Intent(getContext(), ImageDetailActivity.class);
         intent.putExtra(ImageDetailActivity.IMAGE_URI_EXTRA_KEY, uri.toString());
-        startActivityForResult(intent, NIGHT_IMAGE_DETAIL_REQUEST_CODE);
+        intent.putExtra(ImageDetailActivity.IDENTIFIER_EXTRA_KEY, JOURNAL_TIME_IDENTIFIER_NIGHT);
+        startActivityForResult(intent, EditActivity.IMAGE_DETAIL_REQUEST_CODE);
     }
 
     @Override
@@ -192,6 +173,7 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
     }
 
     private void showSnackbar(String s) {
+        Log.d(TAG, "showSnackbar: ");
         SnackbarUtils.showSnackbar(getActivity().findViewById(android.R.id.content), s);
     }
 

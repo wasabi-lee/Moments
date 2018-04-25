@@ -1,17 +1,21 @@
 package com.wasabilee.moments.Activitiy;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.rd.PageIndicatorView;
 import com.wasabilee.moments.Fragment.EditDayFragment;
 import com.wasabilee.moments.Fragment.EditNightFragment;
+import com.wasabilee.moments.Utils.SnackbarUtils;
+import com.wasabilee.moments.Utils.ViewModelFactory;
 import com.wasabilee.moments.ViewModel.EditViewModel;
 import com.wasabilee.moments.R;
 import com.wasabilee.moments.Adapter.ViewPagerAdapter;
@@ -19,14 +23,22 @@ import com.wasabilee.moments.Adapter.ViewPagerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class EditActivity extends AppCompatActivity {
+public class EditActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
-    @BindView(R.id.edit_page_indicator_view)
-    PageIndicatorView mPageIndicatorView;
+    private static final String TAG = EditActivity.class.getSimpleName();
+
+    public static final int IMAGE_DETAIL_REQUEST_CODE = 23;
+
+    public static final String IDENTIFIER_RESULT_EXTRA_KEY = "identifier_result_extra_key";
+    public static final String IMAGE_STATE_RESULT_EXTRA_KEY = "image_state_extra_key";
+    public static final String IMAGE_URI_RESULT_EXTRA_KEY = "image_uri_extra_key";
+
     @BindView(R.id.edit_toolbar)
     Toolbar mToolbar;
     @BindView(R.id.edit_view_pager)
     ViewPager mViewPager;
+    @BindView(R.id.edit_tab_layout)
+    TabLayout mTabLayout;
     ViewPagerAdapter mPagerAdapter;
 
     private EditViewModel mViewModel;
@@ -42,10 +54,12 @@ public class EditActivity extends AppCompatActivity {
 
         setupToolbar();
         setupViewPager();
+        setupSnackbar();
     }
 
     public static EditViewModel obtainViewModel(FragmentActivity activity) {
-        return ViewModelProviders.of(activity).get(EditViewModel.class);
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+        return ViewModelProviders.of(activity, factory).get(EditViewModel.class);
     }
 
     private void setupToolbar() {
@@ -56,26 +70,31 @@ public class EditActivity extends AppCompatActivity {
 
     private void setupViewPager() {
         mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mPagerAdapter.addFragment(ViewPagerAdapter.FARG_POSITION_DAY, new EditDayFragment());
-        mPagerAdapter.addFragment(ViewPagerAdapter.FARG_POSITION_NIGHT, new EditNightFragment());
+        mPagerAdapter.addFragment(ViewPagerAdapter.FARG_POSITION_DAY, new EditDayFragment(), "DAY");
+        mPagerAdapter.addFragment(ViewPagerAdapter.FARG_POSITION_NIGHT, new EditNightFragment(), "NIGHT");
         mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                /* empty */
-            }
+        mTabLayout.addOnTabSelectedListener(this);
+        mTabLayout.setupWithViewPager(mViewPager);
+    }
 
-            @Override
-            public void onPageSelected(int position) {
-                mPageIndicatorView.setSelection(position);
-            }
+    private void setupSnackbar() {
+        mViewModel.getSnackbarTextResource().observe(this, integer -> showSnackbar(getString(integer)));
+        mViewModel.getSnackbarText().observe(this, this::showSnackbar);
+    }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                /* empty */
-            }
-        });
-        mPageIndicatorView.setViewPager(mViewPager);
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        mViewPager.setCurrentItem(tab.getPosition());
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+        /* empty */
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+        /* empty */
     }
 
     @Override
@@ -98,4 +117,10 @@ public class EditActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void showSnackbar(String s) {
+        Log.d(TAG, "showSnackbar: ");
+        SnackbarUtils.showSnackbar(findViewById(android.R.id.content), s);
+    }
+
 }

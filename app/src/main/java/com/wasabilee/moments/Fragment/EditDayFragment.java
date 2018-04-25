@@ -1,14 +1,13 @@
 package com.wasabilee.moments.Fragment;
 
-
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,6 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.wasabilee.moments.Activitiy.EditActivity;
 import com.wasabilee.moments.Activitiy.ImageDetailActivity;
-import com.wasabilee.moments.Utils.ActivityNavigator;
 import com.wasabilee.moments.ViewModel.EditViewModel;
 import com.wasabilee.moments.R;
 import com.wasabilee.moments.Utils.SnackbarUtils;
@@ -33,16 +31,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class EditDayFragment extends Fragment implements DatePickerDialog.OnDateSetListener, View.OnClickListener {
 
     private static final String TAG = EditDayFragment.class.getSimpleName();
 
-    private static final int DAY_IMAGE_DETAIL_REQUEST_CODE = 22;
     public static final String JOURNAL_TIME_IDENTIFIER_DAY = "day_journal";
-
 
     @BindView(R.id.edit_day_date_text)
     TextView mDateText;
@@ -97,47 +90,25 @@ public class EditDayFragment extends Fragment implements DatePickerDialog.OnDate
         mViewModel.start();
         setupCalendar();
         setupImageView();
-        setupSnackbar();
         setupActivityTransitionObservers();
     }
 
     private void setupCalendar() {
-        mDateText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker();
-            }
-        });
+        mDateText.setOnClickListener(v -> showDatePicker());
     }
 
-    private void setupSnackbar() {
-        mViewModel.getSnackbarText().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(@Nullable Integer integer) {
-                showSnackbar(getString(integer));
-            }
-        });
-    }
 
     private void setupActivityTransitionObservers() {
-        mViewModel.getDayActivityChangeLiveData().observe(this, new Observer<ActivityNavigator>() {
-            @Override
-            public void onChanged(@Nullable ActivityNavigator activityNavigator) {
-                if (activityNavigator != null)
-                    switch (activityNavigator) {
-                        case NEW_IMAGE:
-                            toCropImageActivity();
-                            break;
-                    }
-            }
+        mViewModel.getDayActivityChangeLiveData().observe(this, activityNavigator -> {
+            if (activityNavigator != null)
+                switch (activityNavigator) {
+                    case NEW_IMAGE:
+                        toCropImageActivity();
+                        break;
+                }
         });
 
-        mViewModel.getDayImageDetailOpeningEvent().observe(this, new Observer<Uri>() {
-            @Override
-            public void onChanged(@Nullable Uri uri) {
-                toImageDetailActivity(uri);
-            }
-        });
+        mViewModel.getDayImageDetailOpeningEvent().observe(this, this::toImageDetailActivity);
     }
 
     private void showDatePicker() {
@@ -167,7 +138,8 @@ public class EditDayFragment extends Fragment implements DatePickerDialog.OnDate
     private void toImageDetailActivity(Uri uri) {
         Intent intent = new Intent(getContext(), ImageDetailActivity.class);
         intent.putExtra(ImageDetailActivity.IMAGE_URI_EXTRA_KEY, uri.toString());
-        startActivityForResult(intent, DAY_IMAGE_DETAIL_REQUEST_CODE);
+        intent.putExtra(ImageDetailActivity.IDENTIFIER_EXTRA_KEY, JOURNAL_TIME_IDENTIFIER_DAY);
+        startActivityForResult(intent, EditActivity.IMAGE_DETAIL_REQUEST_CODE);
     }
 
     @Override
@@ -194,6 +166,7 @@ public class EditDayFragment extends Fragment implements DatePickerDialog.OnDate
 
 
     private void showSnackbar(String s) {
+        Log.d(TAG, "showSnackbar: ");
         SnackbarUtils.showSnackbar(getActivity().findViewById(android.R.id.content), s);
     }
 

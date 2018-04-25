@@ -31,13 +31,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <View
-                    android:id="@+id/edit_night_dummy_box_1"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/edit_night_date_text"
@@ -49,11 +42,11 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:padding="16dp"
+                    android:padding="20dp"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_night_dummy_box_1"
+                    app:layout_constraintTop_toTopOf="parent"
                     android:text="@{viewmodel.mDate}" />
 
                 <ImageView

@@ -33,6 +33,8 @@
     <string name="journal_header_todo">WHAT WILL MAKE\ TODAY AMAZING?</string>
     <string name="journal_header_affirmations">AFFIRMATIONS</string>
     <string name="unexpected_error">Unexpected error occurred. Please try again later!</string>
-    <string name="image_load_finished">Image loaded</string>
+    <string name="image_load_finished">Loaded image</string>
+    <string name="image_deletion_finished">Deleted image</string>
+    <string name="journal_saved">Saved the journal</string>
 
 </resources>
