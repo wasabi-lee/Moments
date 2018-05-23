@@ -7,7 +7,9 @@ import android.support.annotation.NonNull;
 
 import com.wasabilee.moments.Data.JournalRemoteDataSource;
 import com.wasabilee.moments.Data.JournalRepository;
+import com.wasabilee.moments.ViewModel.DetailViewModel;
 import com.wasabilee.moments.ViewModel.EditViewModel;
+import com.wasabilee.moments.ViewModel.FullImageViewModel;
 import com.wasabilee.moments.ViewModel.ImageDetailViewModel;
 import com.wasabilee.moments.ViewModel.MainViewModel;
 
@@ -53,6 +55,13 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         else if (modelClass.isAssignableFrom(MainViewModel.class)) {
             //noinspection unchecked
             return (T) new MainViewModel(mApplication, mJournalRepository);
+        }
+        else if (modelClass.isAssignableFrom(DetailViewModel.class)) {
+            //noinspection unchecked
+            return (T) new DetailViewModel(mApplication, mJournalRepository);
+        } else if (modelClass.isAssignableFrom(FullImageViewModel.class)) {
+            //noinspection unchecked
+            return (T) new FullImageViewModel(mApplication, mJournalRepository);
         }
 
         return super.create(modelClass);

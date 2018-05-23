@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="viewmodel"
             type="com.wasabilee.moments.ViewModel.EditViewModel" />
@@ -34,24 +36,24 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:padding="20dp"
-                    android:textSize="16sp"
                     android:fontFamily="@font/roboto_bold"
+                    android:padding="20dp"
+                    android:text="@{viewmodel.mDate}"
+                    android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:text="@{viewmodel.mDate}"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/edit_day_journal_image"
                     android:layout_width="0dp"
                     android:layout_height="250dp"
-                    android:visibility="@{viewmodel.isDayImageLoaded ? View.VISIBLE : View.GONE}"
                     android:background="@color/blank_image_background"
-                    app:mDayImageUri="@{viewmodel.mDayImageUri}"
-                    app:layout_constraintTop_toBottomOf="@id/edit_day_journal_no_image_text"
+                    android:visibility="@{viewmodel.isDayImageLoaded ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/edit_day_journal_no_image_text"
+                    app:mDayImageUri="@{viewmodel.mDayImageUri}" />
 
                 <TextView
                     android:id="@+id/edit_day_journal_no_image_text"
@@ -77,7 +79,7 @@
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/roboto_condensed_bold"
                     android:padding="8dp"
-                    android:text="@string/journal_header_grateful"
+                    android:text="@string/journal_header_grateful_all_caps"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -87,11 +89,11 @@
                     android:id="@+id/edit_day_grateful_dummy_number_text_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_condensed_bold"
                     android:layout_marginBottom="8dp"
                     android:layout_marginLeft="24dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="8dp"
+                    android:fontFamily="@font/roboto_condensed_bold"
                     android:text="@string/journal_item_number_1"
                     app:layout_constraintBottom_toTopOf="@+id/edit_day_grateful_edit_2"
                     app:layout_constraintStart_toStartOf="parent"
@@ -103,13 +105,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_1_item_1}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_grateful_dummy_number_text_1"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_grateful_header_text"
-                    android:text="@={viewmodel.mTopic_1_item_1}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_grateful_header_text" />
 
                 <TextView
                     android:id="@+id/edit_day_grateful_dummy_number_text_2"
@@ -131,13 +133,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_1_item_2}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_grateful_dummy_number_text_1"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_grateful_edit_1"
-                    android:text="@={viewmodel.mTopic_1_item_2}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_grateful_edit_1" />
 
                 <TextView
                     android:id="@+id/edit_day_grateful_dummy_number_text_3"
@@ -159,13 +161,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_1_item_3}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_grateful_dummy_number_text_3"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_grateful_edit_2"
-                    android:text="@={viewmodel.mTopic_1_item_3}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_grateful_edit_2" />
 
                 <TextView
                     android:id="@+id/edit_day_todo_header_text"
@@ -175,10 +177,10 @@
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/roboto_condensed_bold"
-                    android:text="@string/journal_header_todo"
+                    android:padding="8dp"
+                    android:text="@string/journal_header_todo_all_caps"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:padding="8dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_day_grateful_edit_3" />
 
@@ -202,13 +204,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_2_item_1}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_todo_dummy_number_text_1"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_todo_header_text"
-                    android:text="@={viewmodel.mTopic_2_item_1}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_todo_header_text" />
 
                 <TextView
                     android:id="@+id/edit_day_todo_dummy_number_text_2"
@@ -230,13 +232,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_2_item_2}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_todo_dummy_number_text_1"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_todo_edit_1"
-                    android:text="@={viewmodel.mTopic_2_item_2}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_todo_edit_1" />
 
                 <TextView
                     android:id="@+id/edit_day_todo_dummy_number_text_3"
@@ -258,13 +260,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_2_item_3}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_todo_dummy_number_text_3"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_todo_edit_2"
-                    android:text="@={viewmodel.mTopic_2_item_3}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_todo_edit_2" />
 
                 <TextView
                     android:id="@+id/edit_day_affirmation_header_text"
@@ -274,10 +276,10 @@
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/roboto_condensed_bold"
-                    android:text="@string/journal_header_affirmations"
+                    android:padding="8dp"
+                    android:text="@string/journal_header_affirmations_all_caps"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:padding="8dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_day_todo_edit_3" />
 
@@ -301,13 +303,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_3_item_1}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_affirmation_dummy_number_text_1"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_affirmation_header_text"
-                    android:text="@={viewmodel.mTopic_3_item_1}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_affirmation_header_text" />
 
                 <TextView
                     android:id="@+id/edit_day_affirmation_dummy_number_text_2"
@@ -329,13 +331,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_3_item_2}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_affirmation_dummy_number_text_1"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_affirmation_edit_1"
-                    android:text="@={viewmodel.mTopic_3_item_2}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_affirmation_edit_1" />
 
                 <TextView
                     android:id="@+id/edit_day_affirmation_dummy_number_text_3"
@@ -357,13 +359,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
+                    android:text="@={viewmodel.mTopic_3_item_3}"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/edit_day_affirmation_dummy_number_text_3"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_day_affirmation_edit_2"
-                    android:text="@={viewmodel.mTopic_3_item_3}"/>
+                    app:layout_constraintTop_toBottomOf="@+id/edit_day_affirmation_edit_2" />
 
                 <View
                     android:id="@+id/edit_day_dummy_box_2"

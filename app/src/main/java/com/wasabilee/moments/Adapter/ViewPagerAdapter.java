@@ -10,8 +10,10 @@ import java.util.List;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    public static final int FARG_POSITION_DAY = 0;
-    public static final int FARG_POSITION_NIGHT = 1;
+    public static final int FARG_POSITION_EDIT_DAY = 0;
+    public static final int FARG_POSITION_EDIT_NIGHT = 1;
+    public static final int FARG_POSITION_DETAIL_DAY = 0;
+    public static final int FARG_POSITION_DETAIL_NIGHT = 1;
 
     private final List<Fragment> mFragmentList = new ArrayList<>();
     private final List<String> mFragmentTitleList = new ArrayList<>();

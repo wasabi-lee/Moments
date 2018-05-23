@@ -12,6 +12,8 @@
         <variable
             name="viewmodel"
             type="com.wasabilee.moments.ViewModel.EditViewModel" />
+
+
     </data>
 
 
@@ -58,7 +60,7 @@
                     app:mNightImageUri="@{viewmodel.mNightImageUri}"
                     app:layout_constraintTop_toBottomOf="@id/edit_night_journal_no_image_text"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"/>
 
                 <TextView
                     android:id="@+id/edit_night_journal_no_image_text"
@@ -84,7 +86,7 @@
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/roboto_condensed_bold"
                     android:padding="8dp"
-                    android:text="@string/journal_header_amazing_things"
+                    android:text="@string/journal_header_amazing_things_all_caps"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -109,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
                     android:text="@={viewmodel.mTopic_4_item_1}"
                     android:textSize="16sp"
@@ -136,7 +138,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
                     android:text="@={viewmodel.mTopic_4_item_2}"
                     android:textSize="16sp"
@@ -163,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
                     android:text="@={viewmodel.mTopic_4_item_3}"
                     android:textSize="16sp"
@@ -180,7 +182,7 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/roboto_condensed_bold"
                     android:padding="8dp"
-                    android:text="@string/journal_header_better"
+                    android:text="@string/journal_header_better_all_caps"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -205,7 +207,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
                     android:text="@={viewmodel.mTopic_5_item_1}"
                     android:textSize="16sp"
@@ -232,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
                     android:text="@={viewmodel.mTopic_5_item_2}"
                     android:textSize="16sp"
@@ -259,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:layout_marginRight="24dp"
-                    android:inputType="text"
+                    android:inputType="textMultiLine"
                     android:paddingTop="8dp"
                     android:text="@={viewmodel.mTopic_5_item_3}"
                     android:textSize="16sp"

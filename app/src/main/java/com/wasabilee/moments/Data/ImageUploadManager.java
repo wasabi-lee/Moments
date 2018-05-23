@@ -3,11 +3,8 @@ package com.wasabilee.moments.Data;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.support.annotation.NonNull;
+import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -16,27 +13,18 @@ import com.wasabilee.moments.R;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import id.zelory.compressor.Compressor;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function3;
 import io.reactivex.schedulers.Schedulers;
 
 public class ImageUploadManager {
 
-    // HashMap variable for tracking the upload status.
-    // Key: Uri
-    // Value: Whether the upload task of this URI is completed or not, regardless of the result of the task.
-    HashMap<String, Boolean> mImageUploadChecker = new HashMap<>();
+    private static final String TAG = ImageUploadCallback.class.getSimpleName();
 
     public interface ImageUploadCallback {
         void onImageUploaded(ImageData result);
@@ -44,6 +32,14 @@ public class ImageUploadManager {
         void onError(String message);
 
         void onImageUploadTasksCompleted();
+    }
+
+    public interface ImageDeletionCallback {
+        void onImageDeleted(ImageData result);
+
+        void onError(String message);
+
+        void onImageDeletionTaskCompleted();
     }
 
     private static ImageUploadManager INSTANCE = null;
@@ -58,16 +54,18 @@ public class ImageUploadManager {
     }
 
     private ImageUploadManager() {
-        mStorageReference = FirebaseStorage.getInstance().getReference();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        storage.setMaxUploadRetryTimeMillis(20000);
+        mStorageReference = storage.getReference();
     }
 
     @SuppressLint("CheckResult")
     public void uploadImage(Context context, List<ImageData> imageDataList, final ImageUploadCallback imageUploadCallback) {
 
-        if (imageDataList == null || imageDataList.size() == 0)
+        if (imageDataList == null || imageDataList.size() == 0) {
+            imageUploadCallback.onImageUploadTasksCompleted();
             return;
-
-        initUploadTaskTracking(imageDataList);
+        }
 
         Observable.fromIterable(imageDataList)
                 .flatMap(imageData -> getImageUploadObservable(context, imageData))
@@ -82,53 +80,71 @@ public class ImageUploadManager {
 
     }
 
-    private void initUploadTaskTracking(List<ImageData> imageDataList) {
-        for (ImageData imageData : imageDataList) {
-            mImageUploadChecker.put(imageData.getmUri().toString(), false);
-        }
+
+    @SuppressWarnings("CheckResult")
+    public void deleteFromStorage(List<ImageData> imageDataList, ImageDeletionCallback callback) {
+        Observable.fromIterable(imageDataList)
+                .flatMap(this::getImageDeletionObservable)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(callback::onImageDeleted,
+                        throwable -> {
+                            throwable.printStackTrace();
+                            callback.onError(throwable.getMessage());
+                        },
+                        callback::onImageDeletionTaskCompleted);
     }
 
-    private Observable<ImageData> getImageUploadObservable(Context context, ImageData imageData) {
-        return Observable.create(emitter -> compressImage(emitter, context, imageData));
 
+    private Observable<ImageData> getImageUploadObservable(Context context, ImageData imageData) {
+        return Observable.create(emitter -> makeImageNetworkCall(emitter, context, imageData));
+    }
+
+    private Observable<ImageData> getImageDeletionObservable(ImageData imageData) {
+        return Observable.create(emitter -> deleteFromStorage(emitter, imageData));
     }
 
 
     @SuppressLint("CheckResult")
-    private void compressImage(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData) {
-        final File imageToCompress = new File(imageData.getmUri().getPath());
-        try {
-            getCompressorFlowable(context, imageToCompress, imageData.isThumb())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(compressedImage -> {
-                                byte[] imageByeArr = getImageData(compressedImage);
-                                uploadToStorage(emitter, imageData, imageByeArr);
-                            },
-                            throwable -> {
-                                throwable.printStackTrace();
-                                emitter.onError(new Throwable("Compression Error"));
-                            });
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void makeImageNetworkCall(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData) {
+        if (imageData.getAction() == ImageData.ACTION_TYPE_DELETE) {
+            deleteFromStorage(emitter, imageData);
+        } else {
+            compressImage(emitter, context, imageData);
         }
     }
 
-    private Flowable<Bitmap> getCompressorFlowable(Context context, File imageToCompress, boolean isThumb) {
-        final int quality = isThumb ? 1 : 20;
-        final int widthHeight = isThumb ? 200 : -1;
-        if (isThumb) {
-            return new Compressor(context)
-                    .setMaxWidth(widthHeight)
-                    .setMaxHeight(widthHeight)
-                    .setQuality(quality)
-                    .compressToBitmapAsFlowable(imageToCompress);
-        } else {
-            return new Compressor(context)
-                    .setQuality(quality)
-                    .compressToBitmapAsFlowable(imageToCompress);
+    private void compressImage(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData) {
+        final File imageToCompress = new File(imageData.getmUri().getPath());
+        if (imageToCompress == null) {
+            emitter.onError(new Throwable("Image Compression Error: Try again later. "));
         }
 
+        Bitmap imageToUpload = getCompressedFile(emitter, context, imageToCompress, imageData.isThumb());
+        byte[] imageByteArr = getImageData(imageToUpload);
+        uploadToStorage(emitter, imageData, imageByteArr);
+    }
+
+    private Bitmap getCompressedFile(ObservableEmitter<ImageData> emitter, Context context, File imageToCompress, boolean isThumb) {
+        final int quality = isThumb ? 5 : 20;
+        final int widthHeight = isThumb ? 200 : -1;
+        try {
+            if (isThumb) {
+                return new Compressor(context)
+                        .setMaxWidth(widthHeight)
+                        .setMaxHeight(widthHeight)
+                        .setQuality(quality)
+                        .compressToBitmap(imageToCompress);
+            } else {
+                return new Compressor(context)
+                        .setQuality(quality)
+                        .compressToBitmap(imageToCompress);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            emitter.onError(e);
+            return null;
+        }
     }
 
 
@@ -138,11 +154,39 @@ public class ImageUploadManager {
         return baos.toByteArray();
     }
 
+
+    private void deleteFromStorage(ObservableEmitter<ImageData> emitter, ImageData imageData) {
+        if (imageData.getmUri() == null && imageData.getUploadedFileName() != null) {
+            String fileToDelete = (imageData.isThumb() ? "journal_images/thumbnails/" : "journal_images/")
+                    + imageData.getUploadedFileName() + ".png";
+
+            mStorageReference.child(fileToDelete)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        imageData.setUploadedFileName(null);
+                        emitter.onNext(imageData);
+                        emitter.onComplete();
+                    }).addOnFailureListener(e -> {
+                emitter.onError(e);
+                emitter.onComplete();
+            });
+
+        }
+
+    }
+
     private void uploadToStorage(ObservableEmitter<ImageData> emitter, ImageData imageData, byte[] imageByteArr) {
-        final String randomName = UUID.randomUUID().toString();
+        final String fileName;
+        if (imageData.getAction() == ImageData.ACTION_TYPE_DELETE_AND_UPLOAD) {
+            // Overriding the existing file
+            fileName = imageData.getUploadedFileName();
+        } else {
+            // Uploading a new image
+            fileName = UUID.randomUUID().toString();
+        }
         String filePath = imageData.isThumb() ? "journal_images/thumbnails" : "journal_images";
         UploadTask uploadTask = mStorageReference.child(filePath)
-                .child(randomName + ".png")
+                .child(fileName + ".png")
                 .putBytes(imageByteArr);
 
         uploadTask.addOnCompleteListener(task -> {
@@ -151,31 +195,16 @@ public class ImageUploadManager {
 
                 final String downloadUrl = task.getResult().getDownloadUrl().toString();
                 imageData.setDownloadUrl(downloadUrl);
+                imageData.setUploadedFileName(fileName);
                 emitter.onNext(imageData);
-
-                mImageUploadChecker.put(imageData.getmUri().toString(), true);
-                if (checkIfAllImagesAreUploaed())
-                    emitter.onComplete();
+                emitter.onComplete();
 
             } else {
-
                 final String errorMessage = task.getException().getMessage();
                 emitter.onError(new Throwable(errorMessage));
-
-                mImageUploadChecker.put(imageData.getmUri().toString(), true);
-                if (checkIfAllImagesAreUploaed())
-                    emitter.onComplete();
 
             }
         });
     }
-
-    private boolean checkIfAllImagesAreUploaed() {
-        for (Map.Entry<String, Boolean> entry : mImageUploadChecker.entrySet()) {
-            if (!entry.getValue()) return false;
-        }
-        return true;
-    }
-
 
 }

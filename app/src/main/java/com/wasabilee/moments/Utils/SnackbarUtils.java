@@ -12,8 +12,6 @@ public class SnackbarUtils {
 
     public static void showSnackbar(View v, String snackbarText) {
         if (v == null || snackbarText == null) {
-            Log.d(TAG, "showSnackbar: " + snackbarText);
-            Log.d(TAG, "showSnackbar: view or snackbar text is null");
             return;
         }
         Snackbar snackbar = Snackbar.make(v, snackbarText, Snackbar.LENGTH_LONG);
@@ -21,7 +19,6 @@ public class SnackbarUtils {
         TextView textView = snackbar.getView().findViewById(snackBarTextId);
         textView.setTextColor(Color.WHITE);
         snackbar.show();
-        Log.d(TAG, "showSnackbar: snackbar successfully shown" );
     }
 
     public static void showSnackbar(String s) {

@@ -3,7 +3,6 @@ package com.wasabilee.moments.ViewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
@@ -16,7 +15,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.wasabilee.moments.Data.JournalRepository;
 import com.wasabilee.moments.R;
-import com.wasabilee.moments.Utils.ActivityNavigator;
+import com.wasabilee.moments.Utils.Navigators.ActivityNavigator;
 
 import static android.app.Activity.RESULT_OK;
 

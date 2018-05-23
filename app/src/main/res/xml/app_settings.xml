@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.preference.PreferenceCategory android:title="Theme">
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="@string/settings_item_key_enable_dark_theme"
+            android:summaryOff="Off"
+            android:summaryOn="On"
+            android:title="Enable Dark Theme" />
+
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory android:title="@string/settings_category_notification">
+
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="@string/settings_item_key_enable_notifications"
+            android:summaryOff="Off"
+            android:summaryOn="On"
+            android:title="@string/settings_item_title_enable_notifications" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="@string/settings_item_key_enable_morning_notification"
+            android:summaryOff="Off"
+            android:summaryOn="On"
+            android:title="@string/settings_item_title_enable_morning_notification" />
+
+        <com.wasabilee.moments.Preference.TimePreference
+            android:key="@string/settings_item_key_morning_notif_time"
+            android:title="@string/settings_item_title_morning_notif_time"
+            android:summary="Set the morning journal notification time"
+            android:defaultValue="480"
+            style="@style/AppPreference.DialogPreference" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="@string/settings_item_key_enable_night_notification"
+            android:summaryOff="Off"
+            android:summaryOn="On"
+            android:title="@string/settings_item_title_enable_night_notification" />
+
+        <com.wasabilee.moments.Preference.TimePreference
+            android:key="@string/settings_item_key_night_notif_time"
+            android:title="@string/settings_item_title_night_notif_time"
+            android:summary="Set the night journal notification time"
+            android:defaultValue="1320"
+            style="@style/AppPreference.DialogPreference"/>
+    </android.support.v7.preference.PreferenceCategory>
+
+</android.support.v7.preference.PreferenceScreen>

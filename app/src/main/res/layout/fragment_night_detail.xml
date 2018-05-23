@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewmodel"
+            type="com.wasabilee.moments.ViewModel.DetailViewModel" />
+    </data>
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{viewmodel.isDataAvailable ? View.VISIBLE : View.GONE}">
+
+            <ImageView
+                android:id="@+id/detail_day_image"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="@color/colorPrimaryDark_light"
+                android:visibility="@{viewmodel.mJournal.night_image_url == null ? View.GONE : View.VISIBLE}"
+                app:imageSource="@{viewmodel.mJournal.night_image_url}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:onClick="@{() -> viewmodel.mImageOpenListener.onImageClicked(viewmodel.mJournal.night_image_url)}"/>
+
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_day_image">
+
+                <TextView
+                    android:id="@+id/detail_date_timestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textStyle="bold"
+                    app:dateText="@{viewmodel.mJournal.user_designated_timestamp}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <TextView
+                    android:id="@+id/detail_precise_timestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/grayed_text"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_date_timestamp"
+                    app:timeText="@{viewmodel.mJournal.user_designated_timestamp}" />
+
+
+                <!-- ***************** Topic 4 ***************** -->
+
+                <TextView
+                    android:id="@+id/detail_header_text_topic_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/journal_header_topic_4"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="@{viewmodel.mJournal.isTopicAvailable(viewmodel.mJournal.topic_4) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_precise_timestamp" />
+
+
+                <TextView
+                    android:id="@+id/detail_item_content_topic_4_item_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@{viewmodel.mJournal.topic_4.get(0)}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_4, 0) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_header_text_topic_4" />
+
+
+                <TextView
+                    android:id="@+id/detail_item_content_topic_4_item_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@{viewmodel.mJournal.topic_4.get(1)}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_4, 1) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_4_item_1" />
+
+                <TextView
+                    android:id="@+id/detail_item_content_topic_4_item_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@{viewmodel.mJournal.topic_4.get(2)}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_4, 2) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_4_item_2" />
+
+
+                <!-- ***************** Topic 2 ***************** -->
+
+
+                <TextView
+                    android:id="@+id/detail_header_text_topic_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/journal_header_topic_5"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="@{viewmodel.mJournal.isTopicAvailable(viewmodel.mJournal.topic_5) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_4_item_3" />
+
+
+                <TextView
+                    android:id="@+id/detail_item_content_topic_5_item_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@{viewmodel.mJournal.topic_5.get(0)}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_5, 0) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/detail_header_text_topic_5" />
+
+
+                <TextView
+                    android:id="@+id/detail_item_content_topic_5_item_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@{viewmodel.mJournal.topic_5.get(1)}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_5, 1) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_5_item_1" />
+
+
+                <TextView
+                    android:id="@+id/detail_item_content_topic_5_item_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@{viewmodel.mJournal.topic_5.get(2)}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_5, 2) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_5_item_2" />
+
+
+            </android.support.constraint.ConstraintLayout>
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+</layout>

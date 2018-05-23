@@ -18,7 +18,6 @@
     <string name="get_started">Get Started</string>
     <string name="add_new_post">Add A New Post</string>
     <string name="logout">Logout</string>
-    <string name="settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -26,15 +25,175 @@
     <string name="journal_item_number_1">1.</string>
     <string name="journal_item_number_2">2.</string>
     <string name="journal_item_number_3">3.</string>
-    <string name="journal_header_grateful">I AM GRATEFUL FOR</string>
+    <string name="journal_header_grateful_all_caps">I AM GRATEFUL FOR</string>
     <string name="no_image_text">Click here to add an image</string>
-    <string name="journal_header_better">WHAT COULD MAKE TODAY BETTER?</string>
-    <string name="journal_header_amazing_things">3 AMAZING THINGS HAPPENED TODAY</string>
-    <string name="journal_header_todo">WHAT WILL MAKE\ TODAY AMAZING?</string>
-    <string name="journal_header_affirmations">AFFIRMATIONS</string>
+    <string name="journal_header_better_all_caps">WHAT COULD MAKE TODAY BETTER?</string>
+    <string name="journal_header_amazing_things_all_caps">3 AMAZING THINGS HAPPENED TODAY</string>
+    <string name="journal_header_todo_all_caps">WHAT WILL MAKE TODAY AMAZING?</string>
+    <string name="journal_header_affirmations_all_caps">AFFIRMATIONS</string>
     <string name="unexpected_error">Unexpected error occurred. Please try again later!</string>
     <string name="image_load_finished">Loaded image</string>
     <string name="image_deletion_finished">Deleted image</string>
     <string name="journal_saved">Saved the journal</string>
+    <string name="journal_edited">Edited the journal</string>
+    <string name="journal_being_uploaded">Saving the journal… Please wait!</string>
+    <string name="journal_being_loaded">Loading journals… Please wait!</string>
+
+
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="journal_header_topic_1">I am grateful for</string>
+    <string name="journal_header_topic_2">What will make today amazing?</string>
+    <string name="journal_header_topic_3">Affirmations</string>
+    <string name="journal_header_topic_4">3 amazing things happened today</string>
+    <string name="journal_header_topic_5">What could make today better?</string>
+
+    <string name="sample_journal_text_topic_1_item_1">This fresh morning</string>
+    <string name="sample_journal_text_topic_1_item_2">The opportunities and the environment that have been given to me</string>
+    <string name="sample_journal_text_topic_1_item_3">My ability and talent that led me till now</string>
+
+    <string name="sample_journal_text_topic_2_item_1">Finishing detail activity building</string>
+    <string name="sample_journal_text_topic_2_item_2">Sleeping early</string>
+    <string name="sample_journal_text_topic_2_item_3">Praying and reading bible</string>
+
+    <string name="sample_journal_text_topic_3_item_1">I will be the best developer</string>
+    <string name="sample_journal_text_topic_3_item_2">I will be fit</string>
+    <string name="sample_journal_text_topic_3_item_3">I will never be complacent</string>
+
+    <string name="sample_journal_text_topic_4_item_1">I could finish the detail activity and building even more!</string>
+    <string name="sample_journal_text_topic_4_item_2">Got a phone call from the employer</string>
+    <string name="sample_journal_text_topic_4_item_3">Paper works are being processed smoothly</string>
+
+    <string name="sample_journal_text_topic_5_item_1">Waking up early</string>
+    <string name="sample_journal_text_topic_5_item_2">Quality hours of focusing on development</string>
+    <string name="sample_journal_text_topic_5_item_3">Manifesting positivity</string>
+    <string name="error_journal_load">Failed to load the journal. Please try again later!</string>
+    <string name="journal_load_completed">Loaded journal</string>
+    <string name="journal_update_completed">Updated journal</string>
+    <string name="journal_deletion_completed">Deleted the journal</string>
+    <string name="journal_loading">Loading journal…</string>
+    <string name="journal_deleting">Deleting journal…</string>
+
+    <string name="sdcard_not_mounted">External storage is not available</string>
+    <string name="space_insufficient">Error: The device space is insufficient</string>
+    <string name="image_saved">Saved image</string>
+
+    <string name="edit_exit_warning_message">Are you sure to exit? The current inputs will be lost.</string>
+    <string name="dialog_yes">YES</string>
+    <string name="dialog_cancel">CANCEL</string>
+
+    <string name="settings_category_theme">Theme</string>
+    <string name="settings_category_notification">Notification</string>
+
+    <string name="settings_item_title_enable_dark_theme">Enable Dark Theme</string>
+    <string name="settings_item_key_enable_dark_theme">settings_key_enable_dark_theme</string>
+
+    <string name="settings_item_title_enable_notifications">Enable Notifications</string>
+    <string name="settings_item_key_enable_notifications">settings_key_enable_notifications</string>
+
+    <string name="settings_item_title_enable_morning_notification">Enable Morning Notification</string>
+    <string name="settings_item_key_enable_morning_notification">settings_key_enable_morning_notification</string>
+
+    <string name="settings_item_title_morning_notif_time">Morning Notification Time</string>
+    <string name="settings_item_key_morning_notif_time">settings_morning_notif_time</string>
+
+    <string name="settings_item_title_enable_night_notification">Enable Night Notification</string>
+    <string name="settings_item_key_enable_night_notification">settings_key_enable_night_notification</string>
+
+    <string name="settings_item_title_night_notif_time">Night Notification Time</string>
+    <string name="settings_item_key_night_notif_time">settings_night_notif_time</string>
+
+    <string name="large_text">
+        "Material is the metaphor.\n\n"
+
+        "A material metaphor is the unifying theory of a rationalized space and a system of motion."
+        "The material is grounded in tactile reality, inspired by the study of paper and ink, yet "
+        "technologically advanced and open to imagination and magic.\n"
+        "Surfaces and edges of the material provide visual cues that are grounded in reality. The "
+        "use of familiar tactile attributes helps users quickly understand affordances. Yet the "
+        "flexibility of the material creates new affordances that supercede those in the physical "
+        "world, without breaking the rules of physics.\n"
+        "The fundamentals of light, surface, and movement are key to conveying how objects move, "
+        "interact, and exist in space and in relation to each other. Realistic lighting shows "
+        "seams, divides space, and indicates moving parts.\n\n"
+
+        "Bold, graphic, intentional.\n\n"
+
+        "The foundational elements of print based design typography, grids, space, scale, color, "
+        "and use of imagery guide visual treatments. These elements do far more than please the "
+        "eye. They create hierarchy, meaning, and focus. Deliberate color choices, edge to edge "
+        "imagery, large scale typography, and intentional white space create a bold and graphic "
+        "interface that immerse the user in the experience.\n"
+        "An emphasis on user actions makes core functionality immediately apparent and provides "
+        "waypoints for the user.\n\n"
+
+        "Motion provides meaning.\n\n"
+
+        "Motion respects and reinforces the user as the prime mover. Primary user actions are "
+        "inflection points that initiate motion, transforming the whole design.\n"
+        "All action takes place in a single environment. Objects are presented to the user without "
+        "breaking the continuity of experience even as they transform and reorganize.\n"
+        "Motion is meaningful and appropriate, serving to focus attention and maintain continuity. "
+        "Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.\n\n"
+
+        "3D world.\n\n"
+
+        "The material environment is a 3D space, which means all objects have x, y, and z "
+        "dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the "
+        "positive z-axis extending towards the viewer. Every sheet of material occupies a single "
+        "position along the z-axis and has a standard 1dp thickness.\n"
+        "On the web, the z-axis is used for layering and not for perspective. The 3D world is "
+        "emulated by manipulating the y-axis.\n\n"
+
+        "Light and shadow.\n\n"
+
+        "Within the material environment, virtual lights illuminate the scene. Key lights create "
+        "directional shadows, while ambient light creates soft shadows from all angles.\n"
+        "Shadows in the material environment are cast by these two light sources. In Android "
+        "development, shadows occur when light sources are blocked by sheets of material at "
+        "various positions along the z-axis. On the web, shadows are depicted by manipulating the "
+        "y-axis only. The following example shows the card with a height of 6dp.\n\n"
+
+        "Resting elevation.\n\n"
+
+        "All material objects, regardless of size, have a resting elevation, or default elevation "
+        "that does not change. If an object changes elevation, it should return to its resting "
+        "elevation as soon as possible.\n\n"
+
+        "Component elevations.\n\n"
+
+        "The resting elevation for a component type is consistent across apps (e.g., FAB elevation "
+        "does not vary from 6dp in one app to 16dp in another app).\n"
+        "Components may have different resting elevations across platforms, depending on the depth "
+        "of the environment (e.g., TV has a greater depth than mobile or desktop).\n\n"
+
+        "Responsive elevation and dynamic elevation offsets.\n\n"
+
+        "Some component types have responsive elevation, meaning they change elevation in response "
+        "to user input (e.g., normal, focused, and pressed) or system events. These elevation "
+        "changes are consistently implemented using dynamic elevation offsets.\n"
+        "Dynamic elevation offsets are the goal elevation that a component moves towards, relative "
+        "to the component’s resting state. They ensure that elevation changes are consistent "
+        "across actions and component types. For example, all components that lift on press have "
+        "the same elevation change relative to their resting elevation.\n"
+        "Once the input event is completed or cancelled, the component will return to its resting "
+        "elevation.\n\n"
+
+        "Avoiding elevation interference.\n\n"
+
+        "Components with responsive elevations may encounter other components as they move between "
+        "their resting elevations and dynamic elevation offsets. Because material cannot pass "
+        "through other material, components avoid interfering with one another any number of ways, "
+        "whether on a per component basis or using the entire app layout.\n"
+        "On a component level, components can move or be removed before they cause interference. "
+        "For example, a floating action button (FAB) can disappear or move off screen before a "
+        "user picks up a card, or it can move if a snackbar appears.\n"
+        "On the layout level, design your app layout to minimize opportunities for interference. "
+        "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
+        "when a user tries to pick up one of cards.\n\n"
+    </string>
+    <string name="action_settings">Settings</string>
+    <string name="detail_menu_edit">Edit</string>
+    <string name="detail_menu_delete">Delete</string>
+    <string name="settings">Settings</string>
 
 </resources>

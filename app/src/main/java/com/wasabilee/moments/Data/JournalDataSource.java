@@ -2,25 +2,32 @@ package com.wasabilee.moments.Data;
 
 import android.support.annotation.NonNull;
 
+import com.wasabilee.moments.Data.Models.Journal;
+
 import java.util.List;
 
 public interface JournalDataSource {
 
     interface UploadJournalCallback {
-        void onJournalUploaded();
+        void onJournalUploaded(String journalId);
         void onError(String message);
     }
 
     interface LoadJournalsCallback {
         void onJournalsLoaded(List<Journal> journals);
-
-        void onDataNotAvailable();
+        void onDataNotAvailable(String message);
     }
 
     interface GetJournalCallback {
         void onJournalLoaded(Journal journal);
 
         void onDataNotAvailable();
+    }
+
+    interface DeleteJournalCallback {
+        void onJournalDeleted();
+
+        void onError();
     }
 
     void getJournals(@NonNull String userId, @NonNull LoadJournalsCallback callback);
@@ -33,5 +40,5 @@ public interface JournalDataSource {
 
     void deleteAllJournals(@NonNull String userId);
 
-    void deleteJournal(@NonNull String journalId);
+    void deleteJournal(@NonNull String journalId, @NonNull DeleteJournalCallback callback);
 }

@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -18,8 +17,8 @@ import android.widget.TextView;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-import com.wasabilee.moments.Activitiy.EditActivity;
-import com.wasabilee.moments.Activitiy.ImageDetailActivity;
+import com.wasabilee.moments.Activity.EditActivity;
+import com.wasabilee.moments.Activity.ImageDetailActivity;
 import com.wasabilee.moments.ViewModel.EditViewModel;
 import com.wasabilee.moments.R;
 import com.wasabilee.moments.Utils.SnackbarUtils;
@@ -67,7 +66,6 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
         mBinding.setViewmodel(mViewModel);
 
         setHasOptionsMenu(true);
-        setRetainInstance(false);
 
         return mBinding.getRoot();
     }
@@ -76,31 +74,14 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mViewModel.start();
         setupCalendar();
         setupImageView();
         setupActivityTransitionObservers();
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.edit_save:
-                //TODO Save edits
-                 mViewModel.saveJournal();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private void setupCalendar() {
-        mDateText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker();
-            }
-        });
+        mDateText.setOnClickListener(v -> showDatePicker());
     }
 
 

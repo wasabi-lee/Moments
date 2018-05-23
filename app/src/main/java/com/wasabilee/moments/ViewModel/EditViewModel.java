@@ -9,6 +9,7 @@ import android.databinding.BindingAdapter;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -16,16 +17,19 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.theartofdev.edmodo.cropper.CropImage;
-import com.wasabilee.moments.Activitiy.EditActivity;
-import com.wasabilee.moments.Activitiy.ImageDetailActivity;
+import com.wasabilee.moments.Activity.EditActivity;
+import com.wasabilee.moments.Activity.ImageDetailActivity;
 import com.wasabilee.moments.Data.ImageData;
 import com.wasabilee.moments.Data.ImageUploadManager;
-import com.wasabilee.moments.Data.Journal;
+import com.wasabilee.moments.Data.Models.Journal;
 import com.wasabilee.moments.Data.JournalDataSource;
 import com.wasabilee.moments.Data.JournalRepository;
 import com.wasabilee.moments.Fragment.EditDayFragment;
+import com.wasabilee.moments.Fragment.EditNightFragment;
 import com.wasabilee.moments.R;
-import com.wasabilee.moments.Utils.ActivityNavigator;
+import com.wasabilee.moments.Utils.Navigators.ActivityNavigator;
+import com.wasabilee.moments.Utils.Navigators.JournalLoadTaskNavigator;
+import com.wasabilee.moments.Utils.Navigators.JournalUploadTaskNavigator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,6 +51,8 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
 
     private final Calendar mCalendar = Calendar.getInstance();
 
+    private MutableLiveData<JournalLoadTaskNavigator> mJournalLoadCompleted = new MutableLiveData<>();
+    private MutableLiveData<JournalUploadTaskNavigator> mJournalUploadCompleted = new MutableLiveData<>();
     private MutableLiveData<ActivityNavigator> mDayActivityChangeEvent = new MutableLiveData<>();
     private MutableLiveData<ActivityNavigator> mNightActivityChangeEvent = new MutableLiveData<>();
 
@@ -84,9 +90,12 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
     private MutableLiveData<String> mSnackbarText = new MutableLiveData<>();
 
 
-    private Journal mJournal;
-    private int mJournalId;
+    public Journal mJournal;
+    private String mJournalId;
     private boolean mIsNewTask;
+
+    private Uri initialDayImageUri = Uri.EMPTY;
+    private Uri initialNightImageUri = Uri.EMPTY;
 
     private boolean isDayImageChanged = false;
     private boolean isNightImageChanged = false;
@@ -98,12 +107,78 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
         mJournalRepository = journalRepository;
     }
 
-    public void start() {
+    public void start(String journalId) {
 
         mAuth = FirebaseAuth.getInstance();
         mJournal = new Journal(mAuth.getUid());
-        setDate(formatDate(getDate()));
+
+        onDateSet(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DATE));
+
+        if (journalId != null) {
+            loadJournal(journalId);
+        }
     }
+
+    public void loadJournal(String journalId) {
+        mJournalLoadCompleted.setValue(JournalLoadTaskNavigator.LOAD_IN_PROGRESS);
+        mJournalRepository.getJournal(journalId, new JournalDataSource.GetJournalCallback() {
+            @Override
+            public void onJournalLoaded(Journal journal) {
+                mSnackbarTextResource.setValue(R.string.journal_load_completed);
+                mJournalLoadCompleted.setValue(JournalLoadTaskNavigator.LOAD_SUCCESSFUL);
+
+                mJournal = journal;
+
+                // Parse the result
+                parseLoadedJournal(journal);
+
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                mJournalLoadCompleted.setValue(JournalLoadTaskNavigator.LOAD_FAILED);
+            }
+        });
+
+    }
+
+    private void parseLoadedJournal(Journal journal) {
+
+        mCalendar.setTime(journal.getUser_designated_timestamp());
+        onDateSet(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DATE));
+
+        parseLoadedImage(journal.getDay_image_url(), EditDayFragment.JOURNAL_TIME_IDENTIFIER_DAY);
+        parseLoadedImage(journal.getNight_image_url(), EditNightFragment.JOURNAL_TIME_IDENTIFIER_NIGHT);
+
+        parseText(Arrays.asList(mTopic_1_item_1, mTopic_1_item_2, mTopic_1_item_3), journal.getTopic_1());
+        parseText(Arrays.asList(mTopic_2_item_1, mTopic_2_item_2, mTopic_2_item_3), journal.getTopic_2());
+        parseText(Arrays.asList(mTopic_3_item_1, mTopic_3_item_2, mTopic_3_item_3), journal.getTopic_3());
+
+    }
+
+
+    private void parseLoadedImage(String url, String identifier) {
+
+        Uri uri = url != null ? Uri.parse(url) : null;
+
+        if (identifier.equals(EditDayFragment.JOURNAL_TIME_IDENTIFIER_DAY)) {
+            initialDayImageUri = uri != null ? uri : Uri.EMPTY;
+            isDayImageLoaded.set(uri != null);
+            mDayImageUri.set(uri);
+        } else {
+            initialNightImageUri = uri != null ? uri : Uri.EMPTY;
+            isNightImageLoaded.set(uri != null);
+            mNightImageUri.set(uri);
+        }
+    }
+
+
+    private void parseText(List<ObservableField<String>> fields, List<String> topic) {
+        for (int i = 0; i < fields.size(); i++) {
+            fields.get(i).set(topic.get(i));
+        }
+    }
+
 
     private String formatDate(Date date) {
         return new SimpleDateFormat("MMM d, yyyy").format(date);
@@ -121,6 +196,10 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
 
     public Date getDate() {
         return mCalendar.getTime();
+    }
+
+    public MutableLiveData<JournalLoadTaskNavigator> getJournalLoadCompleted() {
+        return mJournalLoadCompleted;
     }
 
     public ObservableBoolean getIsDayImageLoaded() {
@@ -193,7 +272,7 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             switch (resultCode) {
                 case RESULT_OK:
-                    handleLoadedImage(result.getUri(), identifier);
+                    handleLoadedImage(result.getUri() == null ? null : result.getUri(), identifier);
                     break;
                 case CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE:
                     result.getError().printStackTrace();
@@ -234,15 +313,25 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
     private void handleLoadedImage(Uri uri, String identifier) {
         if (identifier.equals(EditDayFragment.JOURNAL_TIME_IDENTIFIER_DAY)) {
             isDayImageLoaded.set(uri != null);
-            isDayImageChanged = true;
+            isDayImageChanged = isImageChanged(initialDayImageUri, uri);
+            Log.d(TAG, "handleLoadedImage: " + isDayImageChanged);
             mDayImageUri.set(uri);
         } else {
             isNightImageLoaded.set(uri != null);
-            isNightImageChanged = true;
+            isNightImageChanged = isImageChanged(initialNightImageUri, uri);
             mNightImageUri.set(uri);
+            Log.d(TAG, "handleLoadedImage: " + isNightImageChanged);
         }
-        mSnackbarTextResource.setValue(uri != null ? R.string.image_load_finished : R.string.image_deletion_finished);
     }
+
+    private boolean isImageChanged(Uri initialUri, Uri newUri) {
+        if (initialUri == null) initialUri = Uri.EMPTY;
+        if (newUri == null) newUri = Uri.EMPTY;
+
+        return !initialUri.equals(newUri);
+
+    }
+
 
     public MutableLiveData<Integer> getSnackbarTextResource() {
         return mSnackbarTextResource;
@@ -252,45 +341,68 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
         return mSnackbarText;
     }
 
+    public MutableLiveData<JournalUploadTaskNavigator> getJournalUploadCompleted() {
+        return mJournalUploadCompleted;
+    }
+
     public void saveJournal() {
+        mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_IN_PROGRESS);
         uploadImages(mDayImageUri.get(), mNightImageUri.get());
     }
 
+
     private void uploadImages(Uri dayImageUri, Uri nightImageUri) {
 
-        if (dayImageUri == null && nightImageUri == null) {
-            uploadJouranl();
+        if (!isDayImageChanged && !isNightImageChanged) {
+            uploadJournal();
+            return;
         }
 
-        List<ImageData> imageData = new ArrayList<>();
-
-        if (isDayImageChanged && dayImageUri != null) {
-            imageData.add(new ImageData(dayImageUri, true, false));
-            imageData.add(new ImageData(dayImageUri, true, true));
-        }
-
-        if (isNightImageChanged && nightImageUri != null) {
-            imageData.add(new ImageData(nightImageUri, false, false));
-            imageData.add(new ImageData(nightImageUri, false, true));
-        }
-
-        ImageUploadManager.getInstance().uploadImage(mContext, imageData, this);
+        List<ImageData> imageDataList = generateImageDataList(dayImageUri, nightImageUri);
+        ImageUploadManager.getInstance().uploadImage(mContext, imageDataList, this);
 
     }
+
+
+    private List<ImageData> generateImageDataList(Uri dayImageUri, Uri nightImageUri) {
+        List<ImageData> imageDataList = new ArrayList<>();
+
+        if (isDayImageChanged) {
+            imageDataList.add(new ImageData(dayImageUri,
+                    true, false, mJournal.getDay_image_file_name()));
+            imageDataList.add(new ImageData(dayImageUri,
+                    true, true, mJournal.getDay_image_thumbnail_file_name()));
+        }
+
+        if (isNightImageChanged) {
+            imageDataList.add(new ImageData(nightImageUri,
+                    false, false, mJournal.getNight_image_file_name()));
+            imageDataList.add(new ImageData(nightImageUri,
+                    false, true, mJournal.getNight_image_thumbnail_file_name()));
+        }
+
+        return imageDataList;
+
+    }
+
 
     @Override
     public void onImageUploaded(ImageData result) {
         if (result.isDay()) {
             if (result.isThumb()) {
                 mJournal.setDay_image_thumbnail_url(result.getDownloadUrl());
+                mJournal.setDay_image_thumbnail_file_name(result.getUploadedFileName());
             } else {
                 mJournal.setDay_image_url(result.getDownloadUrl());
+                mJournal.setDay_image_file_name(result.getUploadedFileName());
             }
         } else {
             if (result.isThumb()) {
                 mJournal.setNight_image_thumbnail_url(result.getDownloadUrl());
+                mJournal.setNight_image_thumbnail_file_name(result.getUploadedFileName());
             } else {
                 mJournal.setNight_image_url(result.getDownloadUrl());
+                mJournal.setNight_image_file_name(result.getUploadedFileName());
             }
         }
     }
@@ -303,21 +415,21 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
 
     @Override
     public void onImageUploadTasksCompleted() {
-        uploadJouranl();
+        Log.d(TAG, "onImageUploadTasksCompleted: upload journal");
+        uploadJournal();
     }
 
-    private void uploadJouranl() {
-
+    private void uploadJournal() {
         completeJournalData();
         mJournalRepository.saveJournal(mJournal, new JournalDataSource.UploadJournalCallback() {
             @Override
-            public void onJournalUploaded() {
-                mSnackbarTextResource.setValue(R.string.journal_saved);
+            public void onJournalUploaded(String journalId) {
+                mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_SUCCESSFUL);
             }
 
             @Override
             public void onError(String message) {
-                mSnackbarText.setValue(message);
+                mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_FAILED);
             }
         });
     }
@@ -326,8 +438,8 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
         mJournal.setTimestamp(Calendar.getInstance().getTime());
         mJournal.setUser_designated_timestamp(getDate());
 
-        mJournal.setDay_journal_exists(isDayJouranlCreated());
-        mJournal.setNight_journal_exists(isNightJouranlCreated());
+        mJournal.setDay_journal_exists(isDayJournalCreated());
+        mJournal.setNight_journal_exists(isNightJournalCreated());
 
         mJournal.setTopic_1(new ArrayList<>(Arrays.asList(mTopic_1_item_1.get(), mTopic_1_item_2.get(), mTopic_1_item_3.get())));
         mJournal.setTopic_2(new ArrayList<>(Arrays.asList(mTopic_2_item_1.get(), mTopic_2_item_2.get(), mTopic_2_item_3.get())));
@@ -337,16 +449,20 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
         mJournal.setTopic_5(new ArrayList<>(Arrays.asList(mTopic_5_item_1.get(), mTopic_5_item_2.get(), mTopic_5_item_3.get())));
     }
 
-    private boolean isDayJouranlCreated() {
-        return mDayImageUri.get() != null ||
-                mTopic_1_item_1.get() != null || mTopic_1_item_2.get() != null || mTopic_1_item_3.get() != null ||
-                mTopic_2_item_1.get() != null || mTopic_2_item_2.get() != null || mTopic_2_item_3.get() != null ||
-                mTopic_3_item_1.get() != null || mTopic_3_item_2.get() != null || mTopic_3_item_3.get() != null;
+    public boolean isBeingComposed() {
+        return isDayJournalCreated() || isNightJournalCreated();
     }
 
-    private boolean isNightJouranlCreated() {
+    private boolean isDayJournalCreated() {
+        return mDayImageUri.get() != null ||
+                !TextUtils.isEmpty(mTopic_1_item_1.get()) || !TextUtils.isEmpty(mTopic_1_item_2.get()) || !TextUtils.isEmpty(mTopic_1_item_3.get()) ||
+                !TextUtils.isEmpty(mTopic_2_item_1.get()) || !TextUtils.isEmpty(mTopic_2_item_2.get()) || !TextUtils.isEmpty(mTopic_2_item_3.get()) ||
+                !TextUtils.isEmpty(mTopic_3_item_1.get()) || !TextUtils.isEmpty(mTopic_3_item_2.get()) || !TextUtils.isEmpty(mTopic_3_item_3.get());
+    }
+
+    private boolean isNightJournalCreated() {
         return mNightImageUri.get() != null ||
-                mTopic_4_item_1.get() != null || mTopic_4_item_2.get() != null || mTopic_4_item_3.get() != null ||
-                mTopic_5_item_1.get() != null || mTopic_5_item_2.get() != null || mTopic_5_item_3.get() != null;
+                !TextUtils.isEmpty(mTopic_4_item_1.get()) || !TextUtils.isEmpty(mTopic_4_item_2.get()) || !TextUtils.isEmpty(mTopic_4_item_3.get()) ||
+                !TextUtils.isEmpty(mTopic_5_item_1.get()) || !TextUtils.isEmpty(mTopic_5_item_2.get()) || !TextUtils.isEmpty(mTopic_5_item_3.get());
     }
 }

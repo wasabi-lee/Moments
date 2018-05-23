@@ -4,17 +4,41 @@ import android.net.Uri;
 
 public class ImageData {
 
+
     private Uri mUri;
     private boolean isDay;
     private boolean isThumb;
     private String downloadUrl;
+    private String uploadedFileName;
 
-    public ImageData(Uri mUri, boolean isDay, boolean isThumb) {
+    private int action = -1;
+
+    public static final int ACTION_TYPE_UPLOAD = 0;
+    public static final int ACTION_TYPE_DELETE = 1;
+    public static final int ACTION_TYPE_DELETE_AND_UPLOAD = 2;
+
+    public ImageData(String uploadedFileName, boolean isThumb) {
+        this.uploadedFileName = uploadedFileName;
+        this.isThumb = isThumb;
+        this.action = getUploadAction();
+    }
+
+
+    public ImageData(Uri mUri, boolean isDay, boolean isThumb, String fileName) {
         this.mUri = mUri;
         this.isDay = isDay;
         this.isThumb = isThumb;
+        this.uploadedFileName = fileName;
+        this.action = getUploadAction();
     }
 
+    public String getUploadedFileName() {
+        return uploadedFileName;
+    }
+
+    public void setUploadedFileName(String uploadedFileName) {
+        this.uploadedFileName = uploadedFileName;
+    }
 
     public Uri getmUri() {
         return mUri;
@@ -46,5 +70,19 @@ public class ImageData {
 
     public void setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
+    }
+
+    private int getUploadAction() {
+        if (uploadedFileName == null && mUri != null) {
+            return ACTION_TYPE_UPLOAD;
+        } else if (uploadedFileName != null && mUri == null) {
+            return ACTION_TYPE_DELETE;
+        } else {
+            return ACTION_TYPE_DELETE_AND_UPLOAD;
+        }
+    }
+
+    public int getAction() {
+        return action;
     }
 }
