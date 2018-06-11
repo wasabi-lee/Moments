@@ -19,7 +19,12 @@ import java.util.UUID;
 import id.zelory.compressor.Compressor;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
 
 public class ImageUploadManager {
@@ -81,21 +86,6 @@ public class ImageUploadManager {
     }
 
 
-    @SuppressWarnings("CheckResult")
-    public void deleteFromStorage(List<ImageData> imageDataList, ImageDeletionCallback callback) {
-        Observable.fromIterable(imageDataList)
-                .flatMap(this::getImageDeletionObservable)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(callback::onImageDeleted,
-                        throwable -> {
-                            throwable.printStackTrace();
-                            callback.onError(throwable.getMessage());
-                        },
-                        callback::onImageDeletionTaskCompleted);
-    }
-
-
     private Observable<ImageData> getImageUploadObservable(Context context, ImageData imageData) {
         return Observable.create(emitter -> makeImageNetworkCall(emitter, context, imageData));
     }
@@ -114,6 +104,7 @@ public class ImageUploadManager {
         }
     }
 
+    @SuppressLint("CheckResult")
     private void compressImage(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData) {
         final File imageToCompress = new File(imageData.getmUri().getPath());
         if (imageToCompress == null) {
@@ -122,7 +113,52 @@ public class ImageUploadManager {
 
         Bitmap imageToUpload = getCompressedFile(emitter, context, imageToCompress, imageData.isThumb());
         byte[] imageByteArr = getImageData(imageToUpload);
-        uploadToStorage(emitter, imageData, imageByteArr);
+        imageData.setFileName(getFileName(imageData));
+
+        Observable<ImageData> uploadObservable = Observable.create(inner_emitter ->
+                uploadToStorage(inner_emitter, imageData, imageByteArr));
+        Observable<String> saveObservable = Observable.create(inner_emitter ->
+                downloadImage(inner_emitter, imageData.getFileName(), context, imageByteArr));
+
+        Observable<ImageData> combined = Observable.zip(uploadObservable, saveObservable,
+                (uploadedImageData, localUri) -> {
+                    uploadedImageData.setSavedLocalUri(localUri);
+                    Log.d(TAG, "compressImage: " + localUri);
+                    return uploadedImageData;
+                });
+
+        combined.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(emitter::onNext,
+                        emitter::onError,
+                        emitter::onComplete);
+
+//        uploadToStorage(emitter, imageData, imageByteArr);
+    }
+
+    private String getFileName(ImageData imageData) {
+        return imageData.getAction() == ImageData.ACTION_TYPE_DELETE_AND_UPLOAD ?
+                imageData.getFileName() : UUID.randomUUID().toString();
+    }
+
+    private void downloadImage(ObservableEmitter<String> emitter, String fileName, Context context, byte[] imageByteArr) {
+
+        ImageLocalSaveManager.getInstance()
+                .saveImageInternalStorage(context, fileName, imageByteArr,
+                        new ImageLocalSaveManager.OnImageLocalSavedListener() {
+                            @Override
+                            public void onImageSavedLocally(String uri) {
+                                emitter.onNext(uri);
+                                emitter.onComplete();
+                            }
+
+                            @Override
+                            public void onError(int errorMessageResource) {
+                                emitter.onError(new Throwable(context.getString(errorMessageResource)));
+                            }
+                        });
+
+
     }
 
     private Bitmap getCompressedFile(ObservableEmitter<ImageData> emitter, Context context, File imageToCompress, boolean isThumb) {
@@ -156,14 +192,14 @@ public class ImageUploadManager {
 
 
     private void deleteFromStorage(ObservableEmitter<ImageData> emitter, ImageData imageData) {
-        if (imageData.getmUri() == null && imageData.getUploadedFileName() != null) {
+        if (imageData.getmUri() == null && imageData.getFileName() != null) {
             String fileToDelete = (imageData.isThumb() ? "journal_images/thumbnails/" : "journal_images/")
-                    + imageData.getUploadedFileName() + ".png";
+                    + imageData.getFileName() + ".png";
 
             mStorageReference.child(fileToDelete)
                     .delete()
                     .addOnSuccessListener(aVoid -> {
-                        imageData.setUploadedFileName(null);
+                        imageData.setFileName(null);
                         emitter.onNext(imageData);
                         emitter.onComplete();
                     }).addOnFailureListener(e -> {
@@ -176,35 +212,46 @@ public class ImageUploadManager {
     }
 
     private void uploadToStorage(ObservableEmitter<ImageData> emitter, ImageData imageData, byte[] imageByteArr) {
-        final String fileName;
-        if (imageData.getAction() == ImageData.ACTION_TYPE_DELETE_AND_UPLOAD) {
-            // Overriding the existing file
-            fileName = imageData.getUploadedFileName();
-        } else {
-            // Uploading a new image
-            fileName = UUID.randomUUID().toString();
-        }
+        String fileName = imageData.getFileName();
         String filePath = imageData.isThumb() ? "journal_images/thumbnails" : "journal_images";
-        UploadTask uploadTask = mStorageReference.child(filePath)
-                .child(fileName + ".png")
-                .putBytes(imageByteArr);
+        StorageReference ref = mStorageReference.child(filePath).child(fileName + ".png");
+        UploadTask uploadTask = ref.putBytes(imageByteArr);
 
-        uploadTask.addOnCompleteListener(task -> {
+        uploadTask.addOnSuccessListener(taskSnapshot ->
+                ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                    final String downloadUrl = uri.toString();
+                    imageData.setDownloadUrl(downloadUrl);
+                    emitter.onNext(imageData);
+                    emitter.onComplete();
+                }).addOnFailureListener(e -> e.printStackTrace()))
+                .addOnFailureListener(e -> {
+                    final String errorMessage = e.getMessage();
+                    emitter.onError(new Throwable(errorMessage));
+                });
 
-            if (task.isSuccessful()) {
-
-                final String downloadUrl = task.getResult().getDownloadUrl().toString();
-                imageData.setDownloadUrl(downloadUrl);
-                imageData.setUploadedFileName(fileName);
-                emitter.onNext(imageData);
-                emitter.onComplete();
-
-            } else {
-                final String errorMessage = task.getException().getMessage();
-                emitter.onError(new Throwable(errorMessage));
-
-            }
-        });
     }
+
+
+    /**
+     * Explicit method for other classes to delete images from storage.
+     *
+     * @param imageDataList List of image data to delete
+     * @param callback      callback
+     */
+
+    @SuppressWarnings("CheckResult")
+    public void deleteFromStorage(List<ImageData> imageDataList, ImageDeletionCallback callback) {
+        Observable.fromIterable(imageDataList)
+                .flatMap(this::getImageDeletionObservable)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(callback::onImageDeleted,
+                        throwable -> {
+                            throwable.printStackTrace();
+                            callback.onError(throwable.getMessage());
+                        },
+                        callback::onImageDeletionTaskCompleted);
+    }
+
 
 }

@@ -4,17 +4,12 @@
 
     <item
         android:id="@+id/image_detail_delete"
-        android:icon="@drawable/ic_action_cancel_black"
-        android:title="Delete"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/image_detail_crop"
-        android:icon="@drawable/ic_crop_black"
-        android:title="Crop"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_action_cancel_white"
+        android:title="@string/delete"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/image_detail_new_image"
-        android:icon="@drawable/ic_add_a_photo_black"
-        android:title="Change Image"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_add_a_photo_white"
+        android:title="@string/change_image"
+        app:showAsAction="ifRoom" />
 </menu>

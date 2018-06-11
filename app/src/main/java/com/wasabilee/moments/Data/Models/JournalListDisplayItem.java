@@ -1,9 +1,9 @@
 package com.wasabilee.moments.Data.Models;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -24,13 +24,13 @@ public class JournalListDisplayItem {
     private static final int[] TOPIC_INDICES = new int[]{INDEX_TOPIC_1, INDEX_TOPIC_2, INDEX_TOPIC_3, INDEX_TOPIC_4, INDEX_TOPIC_5};
 
 
-    public String imageUrl;
+    public String imageSource;
     public String textHeader;
     public String textContent;
 
 
     public JournalListDisplayItem(Journal journal) {
-        this.imageUrl = getAvailableImageUrl(journal);
+        this.imageSource = getAvailableImageSource(journal);
         setHeaderAndContent(journal);
 
     }
@@ -46,16 +46,16 @@ public class JournalListDisplayItem {
         }
     }
 
-    private String getAvailableImageUrl(Journal journal) {
-        if (journal.getDay_image_thumbnail_url() != null && journal.getNight_image_thumbnail_url() != null) {
+    private String getAvailableImageSource(Journal journal) {
+        if (journal.getDay_image_thumbnail_local_uri() != null)
+            return journal.getDay_image_thumbnail_local_uri();
+        if (journal.getNight_image_thumbnail_local_uri() != null)
+            return journal.getNight_image_thumbnail_local_uri();
+        if (journal.getDay_image_thumbnail_url() != null)
             return journal.getDay_image_thumbnail_url();
-        } else if (journal.getDay_image_thumbnail_url() != null) {
-            return journal.getDay_image_thumbnail_url();
-        } else if (journal.getNight_image_thumbnail_url() != null) {
+        if (journal.getNight_image_thumbnail_url() != null)
             return journal.getNight_image_thumbnail_url();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     private int getRandomlySelectedHeaderIndex(Journal journal) {
@@ -112,15 +112,25 @@ public class JournalListDisplayItem {
     private List<String> getTopic(int selectedHeaderIndex, Journal journal) {
         switch (selectedHeaderIndex) {
             case INDEX_TOPIC_1:
-                return journal.getTopic_1();
+                return new ArrayList<>(Arrays.asList(journal.getTopic_1_item_1(),
+                        journal.getTopic_1_item_2(),
+                        journal.getTopic_1_item_3()));
             case INDEX_TOPIC_2:
-                return journal.getTopic_2();
+                return new ArrayList<>(Arrays.asList(journal.getTopic_2_item_1(),
+                        journal.getTopic_2_item_2(),
+                        journal.getTopic_1_item_3()));
             case INDEX_TOPIC_3:
-                return journal.getTopic_3();
+                return new ArrayList<>(Arrays.asList(journal.getTopic_3_item_1(),
+                        journal.getTopic_3_item_2(),
+                        journal.getTopic_3_item_3()));
             case INDEX_TOPIC_4:
-                return journal.getTopic_4();
+                return new ArrayList<>(Arrays.asList(journal.getTopic_4_item_1(),
+                        journal.getTopic_4_item_2(),
+                        journal.getTopic_4_item_3()));
             case INDEX_TOPIC_5:
-                return journal.getTopic_5();
+                return new ArrayList<>(Arrays.asList(journal.getTopic_5_item_1(),
+                        journal.getTopic_5_item_2(),
+                        journal.getTopic_5_item_3()));
         }
         return null;
     }

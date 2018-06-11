@@ -3,13 +3,15 @@ package com.wasabilee.moments.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
-import android.widget.ImageView;
+import android.view.MenuItem;
 
 import com.github.chrisbanes.photoview.PhotoView;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -34,18 +36,16 @@ public class ImageDetailActivity extends AppCompatActivity {
     private boolean isImageChanged = false;
     private boolean isImageDeleted = false;
 
-    public static final String IMAGE_URI_EXTRA_KEY = "image_uri_extra_key";
+    public static final String IMAGE_SOURCE_EXTRA_KEY = "image_uri_extra_key";
     public static final String IDENTIFIER_EXTRA_KEY = "identifier_extra_key";
 
+    @BindView(R.id.image_detail_toolbar)
+    Toolbar mToolbar;
     @BindView(R.id.image_detail_image_view)
     PhotoView mImageView;
-    @BindView(R.id.image_detail_bottom_nav)
-    BottomNavigationView mBottomNav;
-    @BindView(R.id.image_detail_back_button)
-    ImageView mBackButton;
 
     private ImageDetailViewModel mViewModel;
-    private Uri mUri;
+    private String mImageSource;
     private String mIdentifier;
 
     private boolean areIconsVisible = true;
@@ -58,63 +58,44 @@ public class ImageDetailActivity extends AppCompatActivity {
         mViewModel = obtainViewModel(this);
         binding.setViewmodel(mViewModel);
 
-        mUri = unpackUriExtra();
+        mImageSource = unpackImageSourceExtra();
         mIdentifier = unpackIdentifier();
 
-        setupBackButton();
+        setupToolbar();
         setupImageView();
-        setupBottomNav();
         setupImageLoadStateObserver();
         setupActivityTransitionObserver();
         setupSnackbar();
     }
 
+    // ------------------------------------ INITIALIZATION -------------------------------------
 
     public static ImageDetailViewModel obtainViewModel(FragmentActivity activity) {
         ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
         return ViewModelProviders.of(activity, factory).get(ImageDetailViewModel.class);
     }
 
-
-    private Uri unpackUriExtra() {
-        String imageUriStr = getIntent().getStringExtra(IMAGE_URI_EXTRA_KEY);
-        return imageUriStr != null ? Uri.parse(imageUriStr) : null;
+    private String unpackImageSourceExtra() {
+        return getIntent().getStringExtra(IMAGE_SOURCE_EXTRA_KEY);
     }
 
     private String unpackIdentifier() {
         return getIntent().getStringExtra(IDENTIFIER_EXTRA_KEY);
     }
 
-    private void setupBackButton() {
-        mBackButton.setOnClickListener(v -> onBackPressed());
+    private void setupToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(null);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void setupImageView() {
-        mViewModel.handleLoadedImage(mUri);
-        mImageView.setOnClickListener(v -> animateIcons());
-    }
-
-    private void setupBottomNav() {
-        mBottomNav.setOnNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.image_detail_new_image:
-                    //TODO Implement new image
-                    mViewModel.getNewImage();
-                    return true;
-                case R.id.image_detail_crop:
-                    //TODO Implement crop function
-                    mViewModel.cropImage();
-                    return true;
-                case R.id.image_detail_delete:
-                    //TODO Implement deletion
-                    mViewModel.deleteImage();
-                    return true;
-            }
-            return false;
-        });
+        mViewModel.handleLoadedImage(mImageSource);
+        mImageView.setOnClickListener(v -> animateToolbar());
     }
 
     private void setupImageLoadStateObserver() {
+        // Get notified when the image is unloaded (deleted), then finish this activity
         mViewModel.getmIsImageLoaded().observe(this, isImageLoaded -> {
             if (isImageLoaded != null && !isImageLoaded) {
                 isImageDeleted = true;
@@ -127,14 +108,12 @@ public class ImageDetailActivity extends AppCompatActivity {
     }
 
     private void setupActivityTransitionObserver() {
+        // Detect any activity change event
         mViewModel.getmActivtyNavigator().observe(this, activityNavigator -> {
             if (activityNavigator != null)
                 switch (activityNavigator) {
                     case NEW_IMAGE:
                         toNewImageActivity();
-                        break;
-                    case CROP_IMAGE:
-                        toCropImageActivity();
                         break;
                 }
         });
@@ -146,14 +125,12 @@ public class ImageDetailActivity extends AppCompatActivity {
         });
     }
 
+
+    // ------------------------------------ ACTIVITY TRANSITION EVENTS -------------------------------------
+
     private void toNewImageActivity() {
         CropImage.activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
-                .start(this);
-    }
-
-    private void toCropImageActivity() {
-        CropImage.activity(mViewModel.getmImageUri().get())
                 .start(this);
     }
 
@@ -163,40 +140,12 @@ public class ImageDetailActivity extends AppCompatActivity {
         if (data != null) isImageChanged = true;
     }
 
-    private Bundle createResultBundle() {
-
-        Bundle results = new Bundle();
-
-        if (mIdentifier != null)
-            results.putString(EditActivity.IDENTIFIER_RESULT_EXTRA_KEY, mIdentifier);
-
-        if (isImageDeleted) {
-            return results;
-        }
-
-        if (isImageChanged) {
-            if (mViewModel.getmImageUri().get() != null)
-                results.putString(EditActivity.IMAGE_URI_RESULT_EXTRA_KEY, mViewModel.getmImageUri().get().toString());
-        }
-        return results;
-    }
-
-    private void animateIcons() {
-        if (areIconsVisible) {
-            // Hide bottom nav
-            mBottomNav.animate().setDuration(150).translationY(mBottomNav.getHeight());
-            mBackButton.animate().setDuration(150).alpha(0f);
-            areIconsVisible = false;
-        } else {
-            // Show bottom nav
-            mBottomNav.animate().setDuration(150).translationY(0);
-            mBackButton.animate().setDuration(150).alpha(1f);
-            areIconsVisible = true;
-        }
-    }
-
-    private void showSnackbar(String s) {
-        SnackbarUtils.showSnackbar(findViewById(android.R.id.content), s);
+    @Override
+    public void onBackPressed() {
+        // Return to prev activity. Set an appropriate result
+        Intent returnIntent = createReturnIntent();
+        setResult(isImageChanged ? IMAGE_STATE_NEW_IMAGE : IMAGE_STATE_UNCHANGED, returnIntent);
+        super.onBackPressed();
     }
 
     private Intent createReturnIntent() {
@@ -205,20 +154,67 @@ public class ImageDetailActivity extends AppCompatActivity {
         return returnIntent;
     }
 
-    @Override
-    public void onBackPressed() {
-        Intent returnIntent = createReturnIntent();
-        if (isImageChanged) {
-            setResult(IMAGE_STATE_NEW_IMAGE, returnIntent);
-        } else {
-            setResult(IMAGE_STATE_UNCHANGED, returnIntent);
+    private Bundle createResultBundle() {
+        // Creating the returning intent's result data.
+        Bundle results = new Bundle();
+
+        // Putting identifier to confirm the fragment that launched this activity (between DAY / NIGHT)
+        if (mIdentifier != null)
+            results.putString(EditActivity.IDENTIFIER_RESULT_EXTRA_KEY, mIdentifier);
+
+        // Notifying the previous activity that the current photo is deleted
+        if (isImageDeleted) {
+            return results;
         }
-        super.onBackPressed();
+
+        // Notifying the previous activity that the current photo is changed
+        if (isImageChanged) {
+            if (mViewModel.getmImageSource().get() != null)
+                results.putString(EditActivity.IMAGE_URI_RESULT_EXTRA_KEY, mViewModel.getmImageSource().get());
+        }
+        return results;
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_image_detail, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.image_detail_delete:
+                mViewModel.deleteImage();
+                break;
+            case R.id.image_detail_new_image:
+                mViewModel.getNewImage();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    // ------------------------------------ UI HANDLING -------------------------------------
+
+    private void animateToolbar() {
+        if (areIconsVisible) {
+            // Hide
+            mToolbar.animate().setDuration(150).alpha(0f);
+            areIconsVisible = false;
+        } else {
+            // Show
+            mToolbar.animate().setDuration(150).alpha(1f);
+            areIconsVisible = true;
+        }
+    }
+
+    private void showSnackbar(String s) {
+        SnackbarUtils.showSnackbar(findViewById(android.R.id.content), s);
+    }
+
 }

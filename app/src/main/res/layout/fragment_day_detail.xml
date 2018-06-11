@@ -30,12 +30,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:background="@color/colorPrimaryDark_light"
-                android:visibility="@{viewmodel.mJournal.day_image_url == null ? View.GONE : View.VISIBLE}"
-                app:imageSource="@{viewmodel.mJournal.day_image_url}"
+                app:imageSource="@{viewmodel.mJournal}"
+                app:imageType="@{viewmodel.mJournal.IMAGE_IDENTIFIER_DAY}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:onClick="@{() -> viewmodel.mImageOpenListener.onImageClicked(viewmodel.mJournal.day_image_url)}"/>
+                android:onClick="@{() -> viewmodel.mImageOpenListener.onImageClicked(viewmodel.mJournal.day_image_local_uri == null ? viewmodel.mJournal.day_image_url : viewmodel.mJournal.day_image_local_uri)}"                />
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -79,7 +79,6 @@
                     android:text="@string/journal_header_topic_1"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:visibility="@{viewmodel.mJournal.isTopicAvailable(viewmodel.mJournal.topic_1) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_precise_timestamp" />
 
@@ -89,8 +88,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_1.get(0)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_1, 0) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_1_item_1}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_1_item_1) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_header_text_topic_1" />
 
@@ -100,8 +99,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_1.get(1)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_1, 1) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_1_item_2}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_1_item_2) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_1_item_1" />
 
@@ -110,8 +109,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_1.get(2)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_1, 2) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_1_item_3}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_1_item_3) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_1_item_2" />
 
@@ -128,7 +127,6 @@
                     android:text="@string/journal_header_topic_2"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:visibility="@{viewmodel.mJournal.isTopicAvailable(viewmodel.mJournal.topic_2) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_1_item_3" />
 
@@ -138,8 +136,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_2.get(0)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_2, 0) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_2_item_1}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_2_item_1) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/detail_header_text_topic_2" />
 
@@ -149,8 +147,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_2.get(1)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_2, 1) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_2_item_2}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_2_item_2) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_2_item_1" />
 
@@ -160,8 +158,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_2.get(2)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_2, 2) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_2_item_3}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_2_item_3) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_2_item_2" />
 
@@ -178,7 +176,6 @@
                     android:text="@string/journal_header_topic_3"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:visibility="@{viewmodel.mJournal.isTopicAvailable(viewmodel.mJournal.topic_3) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_2_item_3"/>
 
@@ -188,8 +185,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_3.get(0)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_3, 0) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_3_item_1}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_3_item_1) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/detail_header_text_topic_3"/>
 
@@ -198,8 +195,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_3.get(1)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_3, 1) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_3_item_2}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_3_item_2) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_3_item_1" />
 
@@ -208,8 +205,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@{viewmodel.mJournal.topic_3.get(2)}"
-                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_3, 2) ? View.VISIBLE : View.GONE}"
+                    android:text="@{viewmodel.mJournal.topic_3_item_3}"
+                    android:visibility="@{viewmodel.mJournal.isTopicItemAvailable(viewmodel.mJournal.topic_3_item_3) ? View.VISIBLE : View.GONE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detail_item_content_topic_3_item_2" />
 

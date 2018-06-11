@@ -50,8 +50,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:visibility="@{journalDisplayItem.imageUrl == null ? View.GONE : View.VISIBLE }"
-                    app:imageSource="@{journalDisplayItem.imageUrl}"
+                    android:visibility="@{journalDisplayItem.imageSource == null ? View.GONE : View.VISIBLE }"
+                    app:thumbnailSource="@{journalDisplayItem.imageSource}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>

@@ -101,6 +101,8 @@
 
     <string name="settings_item_title_night_notif_time">Night Notification Time</string>
     <string name="settings_item_key_night_notif_time">settings_night_notif_time</string>
+    <string name="internet_unstable_upload">Unstable internet connection. Saved as draft :P!</string>
+    <string name="internet_unstable_deletion">Unstable internet connection. Try again later!</string>
 
     <string name="large_text">
         "Material is the metaphor.\n\n"
@@ -195,5 +197,7 @@
     <string name="detail_menu_edit">Edit</string>
     <string name="detail_menu_delete">Delete</string>
     <string name="settings">Settings</string>
+    <string name="delete">Delete</string>
+    <string name="change_image">Change Image</string>
 
 </resources>

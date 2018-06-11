@@ -19,26 +19,21 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.wasabilee.moments.Data.ImageLocalSaveManager;
 import com.wasabilee.moments.Data.JournalRepository;
 import com.wasabilee.moments.R;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Calendar;
 
-public class FullImageViewModel extends AndroidViewModel {
+public class FullImageViewModel extends AndroidViewModel implements ImageLocalSaveManager.OnImageLocalSavedListener {
 
     private Context context;
     private MutableLiveData<Integer> mSnackbarResourceText = new MutableLiveData<>();
     private ObservableBoolean mIsImageLoaded = new ObservableBoolean();
-    public ObservableField<String> mPhotoUrl = new ObservableField<>();
+    public ObservableField<String> mImageSource = new ObservableField<>();
 
 
     public FullImageViewModel(@NonNull Application application, JournalRepository journalRepository) {
@@ -47,7 +42,7 @@ public class FullImageViewModel extends AndroidViewModel {
     }
 
     public void start(String url) {
-        mPhotoUrl.set(url);
+        mImageSource.set(url);
     }
 
     public MutableLiveData<Integer> getmSnackbarResourceText() {
@@ -58,8 +53,8 @@ public class FullImageViewModel extends AndroidViewModel {
         return mIsImageLoaded;
     }
 
-    public ObservableField<String> getmPhotoUrl() {
-        return mPhotoUrl;
+    public ObservableField<String> getmImageSource() {
+        return mImageSource;
     }
 
 
@@ -71,71 +66,88 @@ public class FullImageViewModel extends AndroidViewModel {
                 .into(view);
     }
 
+    @Override
+    public void onImageSavedLocally(String uri) {
+        mSnackbarResourceText.setValue(R.string.image_saved);
+    }
+
+    @Override
+    public void onError(int errorMessageResource) {
+        mSnackbarResourceText.setValue(errorMessageResource);
+    }
+
     public void downloadImage() {
-
-        if (mPhotoUrl.get() == null)
-            return;
-
-        if (!isExternalStorageWritable()) {
-            mSnackbarResourceText.setValue(R.string.sdcard_not_mounted);
-            return;
-        }
-
-        Glide.with(context)
-                .asBitmap()
-                .load(mPhotoUrl.get())
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        saveImage(resource);
-                    }
-                });
-
-
+        ImageLocalSaveManager.getInstance().saveImageExternalStorage(context, mImageSource.get(), this);
     }
 
-    private boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    private void saveImage(Bitmap image) {
-        String savedImagePath = null;
-
-        String imageFileName = Calendar.getInstance().getTimeInMillis() + ".png";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory
-                (Environment.DIRECTORY_PICTURES) + "/Moments");
-
-        boolean success = true;
-
-        if (!storageDir.exists())
-            success = storageDir.mkdirs();
-        if (success) {
-            File imageFile = new File(storageDir, imageFileName);
-            savedImagePath = imageFile.getAbsolutePath();
-            try {
-                OutputStream fOut = new FileOutputStream(imageFile);
-                image.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                fOut.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                mSnackbarResourceText.setValue(R.string.unexpected_error);
-                return;
-            }
-
-            executeMediaScan(savedImagePath);
-            mSnackbarResourceText.setValue(R.string.image_saved);
-        }
-    }
-
-    private void executeMediaScan(String imagePath) {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(imagePath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        context.sendBroadcast(mediaScanIntent);
-    }
+    //
+//    public void downloadImage() {
+//
+//        //TODO Get permission
+//
+//        if (mImageSource.get() == null)
+//            return;
+//
+//        if (!isExternalStorageWritable()) {
+//            mSnackbarResourceText.setValue(R.string.sdcard_not_mounted);
+//            return;
+//        }
+//
+//        Glide.with(context)
+//                .asBitmap()
+//                .load(mImageSource.get())
+//                .into(new SimpleTarget<Bitmap>() {
+//                    @Override
+//                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+//                        saveImage(resource);
+//                    }
+//                });
+//
+//
+//    }
+//
+//    private boolean isExternalStorageWritable() {
+//        String state = Environment.getExternalStorageState();
+//        if (Environment.MEDIA_MOUNTED.equals(state)) {
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    private void saveImage(Bitmap image) {
+//        String savedImagePath = null;
+//
+//        String imageFileName = Calendar.getInstance().getTimeInMillis() + ".png";
+//        File storageDir = new File(Environment.getExternalStoragePublicDirectory
+//                (Environment.DIRECTORY_PICTURES) + "/Moments");
+//
+//        boolean success = true;
+//
+//        if (!storageDir.exists())
+//            success = storageDir.mkdirs();
+//        if (success) {
+//            File imageFile = new File(storageDir, imageFileName);
+//            savedImagePath = imageFile.getAbsolutePath();
+//            try {
+//                OutputStream fOut = new FileOutputStream(imageFile);
+//                image.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+//                fOut.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                mSnackbarResourceText.setValue(R.string.unexpected_error);
+//                return;
+//            }
+//
+//            executeMediaScan(savedImagePath);
+//            mSnackbarResourceText.setValue(R.string.image_saved);
+//        }
+//    }
+//
+//    private void executeMediaScan(String imagePath) {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File f = new File(imagePath);
+//        Uri contentUri = Uri.fromFile(f);
+//        mediaScanIntent.setData(contentUri);
+//        context.sendBroadcast(mediaScanIntent);
+//    }
 }

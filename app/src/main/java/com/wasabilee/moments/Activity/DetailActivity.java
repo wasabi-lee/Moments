@@ -150,9 +150,9 @@ public class DetailActivity extends AppCompatActivity implements TabLayout.OnTab
         startActivityForResult(intent, TO_EDIT_ACTIVITY_REQUEST_CODE);
     }
 
-    private void toFullImageActivity(String url) {
+    private void toFullImageActivity(String imageSource) {
         Intent intent = new Intent(this, FullImageActivity.class);
-        intent.putExtra(FullImageActivity.FULL_IMAGE_URL_EXTRA_KEY, url);
+        intent.putExtra(FullImageActivity.FULL_IMAGE_URL_EXTRA_KEY, imageSource);
         startActivity(intent);
     }
 
@@ -190,7 +190,9 @@ public class DetailActivity extends AppCompatActivity implements TabLayout.OnTab
 
     private void backToPreviousActivity() {
         Intent returnIntent = new Intent();
-        int resultCode = mViewModel.getIsJournalEdited() ? JournalStateNavigator.JOURNAL_STATE_EDITED : JournalStateNavigator.JOURNAL_STATE_UNCHANGED;
+        int resultCode = mViewModel.getIsJournalEdited() ?
+                JournalStateNavigator.JOURNAL_STATE_EDITED :
+                JournalStateNavigator.JOURNAL_STATE_UNCHANGED;
         setResult(resultCode, returnIntent);
         finish();
     }

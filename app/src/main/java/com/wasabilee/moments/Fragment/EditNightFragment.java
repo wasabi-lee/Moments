@@ -130,7 +130,7 @@ public class EditNightFragment extends Fragment implements DatePickerDialog.OnDa
 
     private void toImageDetailActivity(Uri uri) {
         Intent intent = new Intent(getContext(), ImageDetailActivity.class);
-        intent.putExtra(ImageDetailActivity.IMAGE_URI_EXTRA_KEY, uri.toString());
+        intent.putExtra(ImageDetailActivity.IMAGE_SOURCE_EXTRA_KEY, uri.toString());
         intent.putExtra(ImageDetailActivity.IDENTIFIER_EXTRA_KEY, JOURNAL_TIME_IDENTIFIER_NIGHT);
         startActivityForResult(intent, EditActivity.IMAGE_DETAIL_REQUEST_CODE);
     }

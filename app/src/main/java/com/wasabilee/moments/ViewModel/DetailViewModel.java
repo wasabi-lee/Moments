@@ -3,6 +3,7 @@ package com.wasabilee.moments.ViewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
@@ -19,14 +20,18 @@ import com.wasabilee.moments.Utils.JournalImageOpenListener;
 import com.wasabilee.moments.Utils.Navigators.JournalDeletionTaskNavigator;
 import com.wasabilee.moments.Utils.Navigators.JournalLoadTaskNavigator;
 import com.wasabilee.moments.Utils.Navigators.JournalStateNavigator;
+import com.wasabilee.moments.Utils.NetworkChecker;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailViewModel extends AndroidViewModel implements JournalDataSource.GetJournalCallback, ImageUploadManager.ImageDeletionCallback, JournalDataSource.DeleteJournalCallback {
+public class DetailViewModel extends AndroidViewModel implements JournalDataSource.GetJournalCallback,
+        ImageUploadManager.ImageDeletionCallback, JournalDataSource.DeleteJournalCallback,
+        NetworkChecker.NetworkCheckerCallback {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
+    private Context mContext;
     private String mJournalId;
 
     private MutableLiveData<JournalLoadTaskNavigator> mJournalLoadTaskNavigator = new MutableLiveData<>();
@@ -43,10 +48,11 @@ public class DetailViewModel extends AndroidViewModel implements JournalDataSour
     private boolean mIsJournalEdited = false;
 
     private MutableLiveData<String> mJournalImageOpenEvent = new MutableLiveData<>();
-    public JournalImageOpenListener mImageOpenListener = url -> mJournalImageOpenEvent.setValue(url);
+    public JournalImageOpenListener mImageOpenListener = imageSource -> mJournalImageOpenEvent.setValue(imageSource);
 
     public DetailViewModel(Application context, JournalRepository journalRepository) {
         super(context);
+        mContext = context.getApplicationContext();
         mRepository = journalRepository;
     }
 
@@ -55,6 +61,22 @@ public class DetailViewModel extends AndroidViewModel implements JournalDataSour
     }
 
     public void deleteJournal() {
+
+        // Show progress dialog
+        mJournalDeletionTaskNavigator.setValue(JournalDeletionTaskNavigator.DELETION_IN_PROGRESS);
+        NetworkChecker.getInstance().hasActiveInternetConnection(mContext, this);
+
+    }
+
+    @Override
+    public void onNetworkCheckCompleted(boolean isAvailable) {
+        if (isAvailable) {
+            // Dismiss the progress dialog / Show snackbar text
+            mJournalDeletionTaskNavigator.setValue(JournalDeletionTaskNavigator.DELETION_UNSTABLE_CONNECTION);
+            mSnackbarTextResource.setValue(R.string.internet_unstable_deletion);
+            return;
+        }
+
         mJournalDeletionTaskNavigator.setValue(JournalDeletionTaskNavigator.DELETION_IN_PROGRESS);
         if (mJournal != null && mJournal.get() != null) {
             List<ImageData> imagesToDelete = getImageData(mJournal.get());
@@ -143,7 +165,7 @@ public class DetailViewModel extends AndroidViewModel implements JournalDataSour
 
     @Override
     public void onImageDeleted(ImageData result) {
-        Log.d(TAG, "onImageDeleted: " + result.getUploadedFileName());
+        Log.d(TAG, "onImageDeleted: " + result.getFileName());
     }
 
     @Override

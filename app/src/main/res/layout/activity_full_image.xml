@@ -25,7 +25,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:image_url="@{viewmodel.mPhotoUrl}"
+            app:image_url="@{viewmodel.mImageSource}"
             android:background="@android:color/black"/>
 
         <android.support.v7.widget.Toolbar

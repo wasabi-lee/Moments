@@ -9,16 +9,25 @@ public class ImageData {
     private boolean isDay;
     private boolean isThumb;
     private String downloadUrl;
-    private String uploadedFileName;
+    private String fileName;
+    private String savedLocalUri;
 
-    private int action = -1;
+    private int action;
 
     public static final int ACTION_TYPE_UPLOAD = 0;
     public static final int ACTION_TYPE_DELETE = 1;
     public static final int ACTION_TYPE_DELETE_AND_UPLOAD = 2;
 
-    public ImageData(String uploadedFileName, boolean isThumb) {
-        this.uploadedFileName = uploadedFileName;
+    public String getSavedLocalUri() {
+        return savedLocalUri;
+    }
+
+    public void setSavedLocalUri(String savedLocalUri) {
+        this.savedLocalUri = savedLocalUri;
+    }
+
+    public ImageData(String fileName, boolean isThumb) {
+        this.fileName = fileName;
         this.isThumb = isThumb;
         this.action = getUploadAction();
     }
@@ -28,16 +37,16 @@ public class ImageData {
         this.mUri = mUri;
         this.isDay = isDay;
         this.isThumb = isThumb;
-        this.uploadedFileName = fileName;
+        this.fileName = fileName;
         this.action = getUploadAction();
     }
 
-    public String getUploadedFileName() {
-        return uploadedFileName;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setUploadedFileName(String uploadedFileName) {
-        this.uploadedFileName = uploadedFileName;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public Uri getmUri() {
@@ -73,9 +82,9 @@ public class ImageData {
     }
 
     private int getUploadAction() {
-        if (uploadedFileName == null && mUri != null) {
+        if (fileName == null && mUri != null) {
             return ACTION_TYPE_UPLOAD;
-        } else if (uploadedFileName != null && mUri == null) {
+        } else if (fileName != null && mUri == null) {
             return ACTION_TYPE_DELETE;
         } else {
             return ACTION_TYPE_DELETE_AND_UPLOAD;

@@ -30,17 +30,17 @@ import com.wasabilee.moments.R;
 import com.wasabilee.moments.Utils.Navigators.ActivityNavigator;
 import com.wasabilee.moments.Utils.Navigators.JournalLoadTaskNavigator;
 import com.wasabilee.moments.Utils.Navigators.JournalUploadTaskNavigator;
+import com.wasabilee.moments.Utils.NetworkChecker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class EditViewModel extends AndroidViewModel implements ImageUploadManager.ImageUploadCallback {
+public class EditViewModel extends AndroidViewModel implements ImageUploadManager.ImageUploadCallback, NetworkChecker.NetworkCheckerCallback {
 
     private static final String TAG = EditViewModel.class.getSimpleName();
 
@@ -137,6 +137,7 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
             @Override
             public void onDataNotAvailable() {
                 mJournalLoadCompleted.setValue(JournalLoadTaskNavigator.LOAD_FAILED);
+                mSnackbarTextResource.setValue(R.string.unexpected_error);
             }
         });
 
@@ -147,13 +148,29 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
         mCalendar.setTime(journal.getUser_designated_timestamp());
         onDateSet(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DATE));
 
-        parseLoadedImage(journal.getDay_image_url(), EditDayFragment.JOURNAL_TIME_IDENTIFIER_DAY);
-        parseLoadedImage(journal.getNight_image_url(), EditNightFragment.JOURNAL_TIME_IDENTIFIER_NIGHT);
+        String dayImageSource = journal.getDay_image_local_uri() == null ?
+                journal.getDay_image_url() : journal.getDay_image_local_uri();
+        String nightImageSource = journal.getNight_image_local_uri() == null ?
+                journal.getNight_image_url() : journal.getNight_image_local_uri();
 
-        parseText(Arrays.asList(mTopic_1_item_1, mTopic_1_item_2, mTopic_1_item_3), journal.getTopic_1());
-        parseText(Arrays.asList(mTopic_2_item_1, mTopic_2_item_2, mTopic_2_item_3), journal.getTopic_2());
-        parseText(Arrays.asList(mTopic_3_item_1, mTopic_3_item_2, mTopic_3_item_3), journal.getTopic_3());
+        parseLoadedImage(dayImageSource, EditDayFragment.JOURNAL_TIME_IDENTIFIER_DAY);
+        parseLoadedImage(nightImageSource, EditNightFragment.JOURNAL_TIME_IDENTIFIER_NIGHT);
 
+        mTopic_1_item_1.set(journal.getTopic_1_item_1());
+        mTopic_1_item_2.set(journal.getTopic_1_item_2());
+        mTopic_1_item_3.set(journal.getTopic_1_item_3());
+        mTopic_2_item_1.set(journal.getTopic_2_item_1());
+        mTopic_2_item_2.set(journal.getTopic_2_item_2());
+        mTopic_2_item_3.set(journal.getTopic_2_item_3());
+        mTopic_3_item_1.set(journal.getTopic_3_item_1());
+        mTopic_3_item_2.set(journal.getTopic_3_item_2());
+        mTopic_3_item_3.set(journal.getTopic_3_item_3());
+        mTopic_4_item_1.set(journal.getTopic_4_item_1());
+        mTopic_4_item_2.set(journal.getTopic_4_item_2());
+        mTopic_4_item_3.set(journal.getTopic_4_item_3());
+        mTopic_5_item_1.set(journal.getTopic_5_item_1());
+        mTopic_5_item_2.set(journal.getTopic_5_item_2());
+        mTopic_5_item_3.set(journal.getTopic_5_item_3());
     }
 
 
@@ -294,7 +311,7 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
             if (receivedIdentifier != null && receivedIdentifier.equals(identifier)) {
 
                 String uriStr = data.getStringExtra(EditActivity.IMAGE_URI_RESULT_EXTRA_KEY);
-
+                Log.d(TAG, "handleActivityResult: " + uriStr);
                 switch (resultCode) {
                     case ImageDetailActivity.IMAGE_STATE_NEW_IMAGE:
                         handleLoadedImage(uriStr != null ? Uri.parse(uriStr) : null, identifier);
@@ -346,8 +363,10 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
     }
 
     public void saveJournal() {
+        // Show progress dialog
         mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_IN_PROGRESS);
-        uploadImages(mDayImageUri.get(), mNightImageUri.get());
+
+        NetworkChecker.getInstance().hasActiveInternetConnection(mContext, this);
     }
 
 
@@ -357,6 +376,8 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
             uploadJournal();
             return;
         }
+
+        //TODO Save image in local storage
 
         List<ImageData> imageDataList = generateImageDataList(dayImageUri, nightImageUri);
         ImageUploadManager.getInstance().uploadImage(mContext, imageDataList, this);
@@ -390,19 +411,20 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
     public void onImageUploaded(ImageData result) {
         if (result.isDay()) {
             if (result.isThumb()) {
+                //TODO Save uri here
                 mJournal.setDay_image_thumbnail_url(result.getDownloadUrl());
-                mJournal.setDay_image_thumbnail_file_name(result.getUploadedFileName());
+                mJournal.setDay_image_thumbnail_file_name(result.getFileName());
             } else {
                 mJournal.setDay_image_url(result.getDownloadUrl());
-                mJournal.setDay_image_file_name(result.getUploadedFileName());
+                mJournal.setDay_image_file_name(result.getFileName());
             }
         } else {
             if (result.isThumb()) {
                 mJournal.setNight_image_thumbnail_url(result.getDownloadUrl());
-                mJournal.setNight_image_thumbnail_file_name(result.getUploadedFileName());
+                mJournal.setNight_image_thumbnail_file_name(result.getFileName());
             } else {
                 mJournal.setNight_image_url(result.getDownloadUrl());
-                mJournal.setNight_image_file_name(result.getUploadedFileName());
+                mJournal.setNight_image_file_name(result.getFileName());
             }
         }
     }
@@ -425,11 +447,13 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
             @Override
             public void onJournalUploaded(String journalId) {
                 mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_SUCCESSFUL);
+                mSnackbarTextResource.setValue(R.string.journal_update_completed);
             }
 
             @Override
             public void onError(String message) {
                 mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_FAILED);
+                mSnackbarTextResource.setValue(R.string.unexpected_error);
             }
         });
     }
@@ -441,12 +465,21 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
         mJournal.setDay_journal_exists(isDayJournalCreated());
         mJournal.setNight_journal_exists(isNightJournalCreated());
 
-        mJournal.setTopic_1(new ArrayList<>(Arrays.asList(mTopic_1_item_1.get(), mTopic_1_item_2.get(), mTopic_1_item_3.get())));
-        mJournal.setTopic_2(new ArrayList<>(Arrays.asList(mTopic_2_item_1.get(), mTopic_2_item_2.get(), mTopic_2_item_3.get())));
-        mJournal.setTopic_3(new ArrayList<>(Arrays.asList(mTopic_3_item_1.get(), mTopic_3_item_2.get(), mTopic_3_item_3.get())));
-
-        mJournal.setTopic_4(new ArrayList<>(Arrays.asList(mTopic_4_item_1.get(), mTopic_4_item_2.get(), mTopic_4_item_3.get())));
-        mJournal.setTopic_5(new ArrayList<>(Arrays.asList(mTopic_5_item_1.get(), mTopic_5_item_2.get(), mTopic_5_item_3.get())));
+        mJournal.setTopic_1_item_1(mTopic_1_item_1.get());
+        mJournal.setTopic_1_item_2(mTopic_1_item_2.get());
+        mJournal.setTopic_1_item_3(mTopic_1_item_3.get());
+        mJournal.setTopic_2_item_1(mTopic_2_item_1.get());
+        mJournal.setTopic_2_item_2(mTopic_2_item_2.get());
+        mJournal.setTopic_2_item_3(mTopic_2_item_3.get());
+        mJournal.setTopic_3_item_1(mTopic_3_item_1.get());
+        mJournal.setTopic_3_item_2(mTopic_3_item_2.get());
+        mJournal.setTopic_3_item_3(mTopic_3_item_3.get());
+        mJournal.setTopic_4_item_1(mTopic_4_item_1.get());
+        mJournal.setTopic_4_item_2(mTopic_4_item_2.get());
+        mJournal.setTopic_4_item_3(mTopic_4_item_3.get());
+        mJournal.setTopic_5_item_1(mTopic_5_item_1.get());
+        mJournal.setTopic_5_item_2(mTopic_5_item_2.get());
+        mJournal.setTopic_5_item_3(mTopic_5_item_3.get());
     }
 
     public boolean isBeingComposed() {
@@ -464,5 +497,21 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
         return mNightImageUri.get() != null ||
                 !TextUtils.isEmpty(mTopic_4_item_1.get()) || !TextUtils.isEmpty(mTopic_4_item_2.get()) || !TextUtils.isEmpty(mTopic_4_item_3.get()) ||
                 !TextUtils.isEmpty(mTopic_5_item_1.get()) || !TextUtils.isEmpty(mTopic_5_item_2.get()) || !TextUtils.isEmpty(mTopic_5_item_3.get());
+    }
+
+    @Override
+    public void onNetworkCheckCompleted(boolean isAvailable) {
+
+        // Dismiss the progress dialog / Show snackbar text
+        if (!isAvailable) {
+            mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_UNSTABLE_CONNECTION);
+            mSnackbarTextResource.setValue(R.string.internet_unstable_upload);
+
+            //TODO Save this journal as draft.
+
+            return;
+        }
+        // Stable internet connection. Proceed the upload.
+        uploadImages(mDayImageUri.get(), mNightImageUri.get());
     }
 }

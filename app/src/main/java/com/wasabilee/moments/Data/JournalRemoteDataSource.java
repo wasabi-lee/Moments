@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -40,6 +41,11 @@ public class JournalRemoteDataSource implements JournalDataSource {
 
     private JournalRemoteDataSource() {
         mFirebaseFirestore = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        mFirebaseFirestore.setFirestoreSettings(settings);
+
     }
 
     @Override
@@ -104,8 +110,10 @@ public class JournalRemoteDataSource implements JournalDataSource {
                     .add(journal)
                     .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
+                    Log.d(TAG, "saveJournal: " + task.getResult().getId());
                     callback.onJournalUploaded(task.getResult().getId());
                 } else {
+                    Log.d(TAG, "saveJournal: exception");
                     task.getException().printStackTrace();
                     callback.onError(task.getException().getMessage());
                 }

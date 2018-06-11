@@ -3,6 +3,7 @@ package com.wasabilee.moments.Data;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -10,11 +11,17 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.wasabilee.moments.Adapter.JournalAdapter;
 import com.wasabilee.moments.Data.Models.DateData;
+import com.wasabilee.moments.Data.Models.Journal;
 import com.wasabilee.moments.Data.Models.JournalData;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static com.wasabilee.moments.Data.Models.Journal.IMAGE_IDENTIFIER_DAY;
+import static com.wasabilee.moments.Data.Models.Journal.IMAGE_IDENTIFIER_DAY_THUMB;
+import static com.wasabilee.moments.Data.Models.Journal.IMAGE_IDENTIFIER_NIGHT;
+import static com.wasabilee.moments.Data.Models.Journal.IMAGE_IDENTIFIER_NIGHT_THUMB;
 
 public class JournalListBindings {
 
@@ -30,18 +37,45 @@ public class JournalListBindings {
         }
     }
 
-    @BindingAdapter({"app:imageSource"})
-    public static void loadImage(ImageView imageView, String imageUrl) {
-        if (imageUrl != null) {
-            try {
-                Glide.with(imageView.getContext())
-                        .applyDefaultRequestOptions(RequestOptions.centerCropTransform())
-                        .load(imageUrl)
-                        .into(imageView);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    @BindingAdapter({"app:thumbnailSource"})
+    public static void loadThumbnail(ImageView imageView, String thumbnailSource) {
+        Glide.with(imageView.getContext())
+                .applyDefaultRequestOptions(RequestOptions.centerCropTransform())
+                .load(thumbnailSource)
+                .into(imageView);
+    }
+
+    @BindingAdapter({"app:imageSource", "app:imageType"})
+    public static void loadImage(ImageView imageView, Journal journal, String type) {
+        String imageUri = null, imageUrl = null;
+
+        switch (type) {
+            case IMAGE_IDENTIFIER_DAY:
+                imageUri = journal.getDay_image_local_uri();
+                imageUrl = journal.getDay_image_url();
+                break;
+            case IMAGE_IDENTIFIER_NIGHT:
+                imageUri = journal.getNight_image_local_uri();
+                imageUrl = journal.getNight_image_url();
+                break;
         }
+
+        // Visibility Setting
+        if (imageUri == null && imageUrl == null) {
+            imageView.setVisibility(View.GONE);
+            return;
+        }
+
+        // Setting image
+        try {
+            Glide.with(imageView.getContext())
+                    .applyDefaultRequestOptions(RequestOptions.centerCropTransform())
+                    .load(imageUri != null ? imageUri : imageUrl)
+                    .into(imageView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @BindingAdapter({"app:dateText"})

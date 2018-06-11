@@ -26,7 +26,6 @@ import com.wasabilee.moments.Adapter.ViewPagerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.wasabilee.moments.Utils.Navigators.JournalStateNavigator.JOURNAL_STATE_EDITED;
 import static com.wasabilee.moments.Utils.Navigators.JournalStateNavigator.JOURNAL_STATE_LOAD_FAILED;
 import static com.wasabilee.moments.Utils.Navigators.JournalStateNavigator.JOURNAL_STATE_UNCHANGED;
 
@@ -105,16 +104,23 @@ public class EditActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 if (journalUploadCompleted == JournalUploadTaskNavigator.UPLOAD_IN_PROGRESS) {
                     mDialog.show();
                 }
-                if (journalUploadCompleted == JournalUploadTaskNavigator.UPLOAD_SUCCESSFUL ||
-                        journalUploadCompleted == JournalUploadTaskNavigator.UPLOAD_FAILED) {
-                    if (mDialog != null && mDialog.isShowing())
-                        mDialog.dismiss();
-                    if (journalUploadCompleted == JournalUploadTaskNavigator.UPLOAD_SUCCESSFUL)
-                        if (mJournalId == null) {
-                            backToPreviousActivity(JournalStateNavigator.JOURNAL_STATE_ADDED_NEW);
-                        } else {
-                            backToPreviousActivity(JOURNAL_STATE_EDITED);
-                        }
+
+                switch (journalUploadCompleted) {
+                    case UPLOAD_IN_PROGRESS:
+                        mDialog.show();
+                        break;
+                    case UPLOAD_SUCCESSFUL:
+                        hideDialog();
+                        backToPreviousActivity(mJournalId == null ?
+                                JournalStateNavigator.JOURNAL_STATE_ADDED_NEW :
+                                JournalStateNavigator.JOURNAL_STATE_EDITED);
+                        break;
+                    case UPLOAD_UNSTABLE_CONNECTION:
+                        hideDialog();
+                        break;
+                    case UPLOAD_FAILED:
+                        hideDialog();
+                        break;
                 }
             }
         });

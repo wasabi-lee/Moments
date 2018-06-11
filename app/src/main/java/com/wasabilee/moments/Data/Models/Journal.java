@@ -27,6 +27,16 @@ public class Journal extends JournalData {
     @Exclude
     public static final String TOPIC_5_DISPLAY_TEXT = "What Could Make Today Better?";
 
+
+    @Exclude
+    public static final String IMAGE_IDENTIFIER_DAY = "day";
+    @Exclude
+    public static final String IMAGE_IDENTIFIER_DAY_THUMB = "day_thumb";
+    @Exclude
+    public static final String IMAGE_IDENTIFIER_NIGHT = "night";
+    @Exclude
+    public static final String IMAGE_IDENTIFIER_NIGHT_THUMB = "night_thumb";
+
     @Exclude
     private String journalId;
 
@@ -42,19 +52,39 @@ public class Journal extends JournalData {
     private boolean night_journal_exists = false;
 
     private String day_image_url;
+    private String day_image_local_uri;
     private String day_image_file_name;
     private String day_image_thumbnail_url;
+    private String day_image_thumbnail_local_uri;
     private String day_image_thumbnail_file_name;
-    private List<String> topic_1;
-    private List<String> topic_2;
-    private List<String> topic_3;
 
     private String night_image_url;
+    private String night_image_local_uri;
     private String night_image_file_name;
     private String night_image_thumbnail_url;
+    private String night_image_thumbnail_local_uri;
     private String night_image_thumbnail_file_name;
-    private List<String> topic_4;
-    private List<String> topic_5;
+
+    private String topic_1_item_1;
+    private String topic_1_item_2;
+    private String topic_1_item_3;
+
+    private String topic_2_item_1;
+    private String topic_2_item_2;
+    private String topic_2_item_3;
+
+    private String topic_3_item_1;
+    private String topic_3_item_2;
+    private String topic_3_item_3;
+
+    private String topic_4_item_1;
+    private String topic_4_item_2;
+    private String topic_4_item_3;
+
+    private String topic_5_item_1;
+    private String topic_5_item_2;
+    private String topic_5_item_3;
+
 
     public Journal() {
     }
@@ -92,6 +122,14 @@ public class Journal extends JournalData {
         this.timestamp = timestamp;
     }
 
+    public Date getUser_designated_timestamp() {
+        return user_designated_timestamp;
+    }
+
+    public void setUser_designated_timestamp(Date user_designated_timestamp) {
+        this.user_designated_timestamp = user_designated_timestamp;
+    }
+
     public boolean isDay_journal_exists() {
         return day_journal_exists;
     }
@@ -116,76 +154,12 @@ public class Journal extends JournalData {
         this.day_image_url = day_image_url;
     }
 
-    public String getDay_image_thumbnail_url() {
-        return day_image_thumbnail_url;
+    public String getDay_image_local_uri() {
+        return day_image_local_uri;
     }
 
-    public void setDay_image_thumbnail_url(String day_image_thumbnail_url) {
-        this.day_image_thumbnail_url = day_image_thumbnail_url;
-    }
-
-    public String getNight_image_url() {
-        return night_image_url;
-    }
-
-    public void setNight_image_url(String night_image_url) {
-        this.night_image_url = night_image_url;
-    }
-
-    public String getNight_image_thumbnail_url() {
-        return night_image_thumbnail_url;
-    }
-
-    public void setNight_image_thumbnail_url(String night_image_thumbnail_url) {
-        this.night_image_thumbnail_url = night_image_thumbnail_url;
-    }
-
-    public Date getUser_designated_timestamp() {
-        return user_designated_timestamp;
-    }
-
-    public void setUser_designated_timestamp(Date user_designated_timestamp) {
-        this.user_designated_timestamp = user_designated_timestamp;
-    }
-
-    public List<String> getTopic_1() {
-        return topic_1;
-    }
-
-    public void setTopic_1(List<String> topic_1) {
-        this.topic_1 = topic_1;
-    }
-
-    public List<String> getTopic_2() {
-        return topic_2;
-    }
-
-    public void setTopic_2(List<String> topic_2) {
-        this.topic_2 = topic_2;
-    }
-
-    public List<String> getTopic_3() {
-        return topic_3;
-    }
-
-    public void setTopic_3(List<String> topic_3) {
-        this.topic_3 = topic_3;
-    }
-
-    public List<String> getTopic_4() {
-        return topic_4;
-    }
-
-    public void setTopic_4(List<String> topic_4) {
-        this.topic_4 = topic_4;
-    }
-
-    public List<String> getTopic_5() {
-        return topic_5;
-    }
-
-    public void setTopic_5(List<String> topic_5) {
-        this.topic_5 = topic_5;
+    public void setDay_image_local_uri(String day_image_local_uri) {
+        this.day_image_local_uri = day_image_local_uri;
     }
 
     public String getDay_image_file_name() {
@@ -196,12 +170,44 @@ public class Journal extends JournalData {
         this.day_image_file_name = day_image_file_name;
     }
 
+    public String getDay_image_thumbnail_url() {
+        return day_image_thumbnail_url;
+    }
+
+    public void setDay_image_thumbnail_url(String day_image_thumbnail_url) {
+        this.day_image_thumbnail_url = day_image_thumbnail_url;
+    }
+
+    public String getDay_image_thumbnail_local_uri() {
+        return day_image_thumbnail_local_uri;
+    }
+
+    public void setDay_image_thumbnail_local_uri(String day_image_thumbnail_local_uri) {
+        this.day_image_thumbnail_local_uri = day_image_thumbnail_local_uri;
+    }
+
     public String getDay_image_thumbnail_file_name() {
         return day_image_thumbnail_file_name;
     }
 
     public void setDay_image_thumbnail_file_name(String day_image_thumbnail_file_name) {
         this.day_image_thumbnail_file_name = day_image_thumbnail_file_name;
+    }
+
+    public String getNight_image_url() {
+        return night_image_url;
+    }
+
+    public void setNight_image_url(String night_image_url) {
+        this.night_image_url = night_image_url;
+    }
+
+    public String getNight_image_local_uri() {
+        return night_image_local_uri;
+    }
+
+    public void setNight_image_local_uri(String night_image_local_uri) {
+        this.night_image_local_uri = night_image_local_uri;
     }
 
     public String getNight_image_file_name() {
@@ -212,12 +218,148 @@ public class Journal extends JournalData {
         this.night_image_file_name = night_image_file_name;
     }
 
+    public String getNight_image_thumbnail_url() {
+        return night_image_thumbnail_url;
+    }
+
+    public void setNight_image_thumbnail_url(String night_image_thumbnail_url) {
+        this.night_image_thumbnail_url = night_image_thumbnail_url;
+    }
+
+    public String getNight_image_thumbnail_local_uri() {
+        return night_image_thumbnail_local_uri;
+    }
+
+    public void setNight_image_thumbnail_local_uri(String night_image_thumbnail_local_uri) {
+        this.night_image_thumbnail_local_uri = night_image_thumbnail_local_uri;
+    }
+
     public String getNight_image_thumbnail_file_name() {
         return night_image_thumbnail_file_name;
     }
 
     public void setNight_image_thumbnail_file_name(String night_image_thumbnail_file_name) {
         this.night_image_thumbnail_file_name = night_image_thumbnail_file_name;
+    }
+
+    public String getTopic_1_item_1() {
+        return topic_1_item_1;
+    }
+
+    public void setTopic_1_item_1(String topic_1_item_1) {
+        this.topic_1_item_1 = topic_1_item_1;
+    }
+
+    public String getTopic_1_item_2() {
+        return topic_1_item_2;
+    }
+
+    public void setTopic_1_item_2(String topic_1_item_2) {
+        this.topic_1_item_2 = topic_1_item_2;
+    }
+
+    public String getTopic_1_item_3() {
+        return topic_1_item_3;
+    }
+
+    public void setTopic_1_item_3(String topic_1_item_3) {
+        this.topic_1_item_3 = topic_1_item_3;
+    }
+
+    public String getTopic_2_item_1() {
+        return topic_2_item_1;
+    }
+
+    public void setTopic_2_item_1(String topic_2_item_1) {
+        this.topic_2_item_1 = topic_2_item_1;
+    }
+
+    public String getTopic_2_item_2() {
+        return topic_2_item_2;
+    }
+
+    public void setTopic_2_item_2(String topic_2_item_2) {
+        this.topic_2_item_2 = topic_2_item_2;
+    }
+
+    public String getTopic_2_item_3() {
+        return topic_2_item_3;
+    }
+
+    public void setTopic_2_item_3(String topic_2_item_3) {
+        this.topic_2_item_3 = topic_2_item_3;
+    }
+
+    public String getTopic_3_item_1() {
+        return topic_3_item_1;
+    }
+
+    public void setTopic_3_item_1(String topic_3_item_1) {
+        this.topic_3_item_1 = topic_3_item_1;
+    }
+
+    public String getTopic_3_item_2() {
+        return topic_3_item_2;
+    }
+
+    public void setTopic_3_item_2(String topic_3_item_2) {
+        this.topic_3_item_2 = topic_3_item_2;
+    }
+
+    public String getTopic_3_item_3() {
+        return topic_3_item_3;
+    }
+
+    public void setTopic_3_item_3(String topic_3_item_3) {
+        this.topic_3_item_3 = topic_3_item_3;
+    }
+
+    public String getTopic_4_item_1() {
+        return topic_4_item_1;
+    }
+
+    public void setTopic_4_item_1(String topic_4_item_1) {
+        this.topic_4_item_1 = topic_4_item_1;
+    }
+
+    public String getTopic_4_item_2() {
+        return topic_4_item_2;
+    }
+
+    public void setTopic_4_item_2(String topic_4_item_2) {
+        this.topic_4_item_2 = topic_4_item_2;
+    }
+
+    public String getTopic_4_item_3() {
+        return topic_4_item_3;
+    }
+
+    public void setTopic_4_item_3(String topic_4_item_3) {
+        this.topic_4_item_3 = topic_4_item_3;
+    }
+
+    public String getTopic_5_item_1() {
+        return topic_5_item_1;
+    }
+
+    public void setTopic_5_item_1(String topic_5_item_1) {
+        this.topic_5_item_1 = topic_5_item_1;
+    }
+
+    public String getTopic_5_item_2() {
+        return topic_5_item_2;
+    }
+
+    public void setTopic_5_item_2(String topic_5_item_2) {
+        this.topic_5_item_2 = topic_5_item_2;
+    }
+
+    public String getTopic_5_item_3() {
+        return topic_5_item_3;
+    }
+
+    public void setTopic_5_item_3(String topic_5_item_3) {
+        this.topic_5_item_3 = topic_5_item_3;
     }
 
     public boolean isTopicAvailable(List<String> topic) {
@@ -230,7 +372,7 @@ public class Journal extends JournalData {
         return false;
     }
 
-    public boolean isTopicItemAvailable(List<String> topic, int itemIndex) {
-        return topic != null && topic.get(itemIndex) != null && !topic.get(itemIndex).isEmpty();
+    public boolean isTopicItemAvailable(String item) {
+        return item != null && !item.isEmpty();
     }
 }
