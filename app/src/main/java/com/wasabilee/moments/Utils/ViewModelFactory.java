@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
+import com.wasabilee.moments.Data.JournalLocalDataSource;
 import com.wasabilee.moments.Data.JournalRemoteDataSource;
 import com.wasabilee.moments.Data.JournalRepository;
 import com.wasabilee.moments.ViewModel.DetailViewModel;
@@ -26,7 +27,8 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
             synchronized (ViewModelFactory.class) {
                 if (INSTANCE == null)
                     INSTANCE = new ViewModelFactory(application,
-                        JournalRepository.getInstance(JournalRemoteDataSource.getInstance()));
+                            JournalRepository.getInstance(JournalRemoteDataSource.getInstance(),
+                                    JournalLocalDataSource.getInstance(application)));
             }
         }
         return INSTANCE;
@@ -47,16 +49,13 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         if (modelClass.isAssignableFrom(ImageDetailViewModel.class)) {
             //noinspection unchecked
             return (T) new ImageDetailViewModel(mApplication, mJournalRepository);
-        }
-        else if (modelClass.isAssignableFrom(EditViewModel.class)) {
+        } else if (modelClass.isAssignableFrom(EditViewModel.class)) {
             //noinspection unchecked
             return (T) new EditViewModel(mApplication, mJournalRepository);
-        }
-        else if (modelClass.isAssignableFrom(MainViewModel.class)) {
+        } else if (modelClass.isAssignableFrom(MainViewModel.class)) {
             //noinspection unchecked
             return (T) new MainViewModel(mApplication, mJournalRepository);
-        }
-        else if (modelClass.isAssignableFrom(DetailViewModel.class)) {
+        } else if (modelClass.isAssignableFrom(DetailViewModel.class)) {
             //noinspection unchecked
             return (T) new DetailViewModel(mApplication, mJournalRepository);
         } else if (modelClass.isAssignableFrom(FullImageViewModel.class)) {

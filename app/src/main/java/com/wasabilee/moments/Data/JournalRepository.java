@@ -13,18 +13,22 @@ public class JournalRepository implements JournalDataSource {
 
     private volatile static JournalRepository INSTANCE = null;
     private JournalDataSource mJournalRemoteDataSource;
+    private JournalDataSource mJournalLocalDataSource;
     private Map<String, Journal> mCachedJournals;
     private boolean mCacheIsDirty = false;
 
-    private JournalRepository(@NonNull JournalRemoteDataSource journalRemoteDataSource) {
+    private JournalRepository(@NonNull JournalRemoteDataSource journalRemoteDataSource,
+                              @NonNull JournalLocalDataSource journalLocalDataSource) {
         this.mJournalRemoteDataSource = journalRemoteDataSource;
+        this.mJournalLocalDataSource = journalLocalDataSource;
     }
 
-    public static JournalRepository getInstance(JournalRemoteDataSource journalRemoteDataSource) {
+    public static JournalRepository getInstance(JournalRemoteDataSource journalRemoteDataSource,
+                                                JournalLocalDataSource journalLocalDataSource) {
         if (INSTANCE == null) {
             synchronized (JournalRepository.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new JournalRepository(journalRemoteDataSource);
+                    INSTANCE = new JournalRepository(journalRemoteDataSource, journalLocalDataSource);
                 }
             }
         }
@@ -112,11 +116,11 @@ public class JournalRepository implements JournalDataSource {
     }
 
     @Override
-    public void saveJournal(@NonNull Journal journal, @NonNull final UploadJournalCallback callback) {
-        mJournalRemoteDataSource.saveJournal(journal, new UploadJournalCallback() {
+    public void saveJournal(@NonNull Journal journal, @NonNull final JournalSaveCallback callback) {
+        mJournalRemoteDataSource.saveJournal(journal, new JournalSaveCallback() {
             @Override
-            public void onJournalUploaded(String journalId) {
-                callback.onJournalUploaded(journalId);
+            public void onJournalSaved(String journalId) {
+                callback.onJournalSaved(journalId);
                 if (mCachedJournals == null) {
                     mCachedJournals = new LinkedHashMap<>();
                 }
@@ -158,4 +162,20 @@ public class JournalRepository implements JournalDataSource {
         });
 
     }
+
+    public void saveJournalLocally(@NonNull Journal journal, @NonNull JournalLocalSaveCallback callback) {
+        // Explicit call to save the journal only in local db.
+        mJournalLocalDataSource.saveJournal(journal, new JournalSaveCallback() {
+            @Override
+            public void onJournalSaved(String journalId) {
+                callback.onJournalSavedLocal(journalId);
+            }
+
+            @Override
+            public void onError(String message) {
+                callback.onError();
+            }
+        });
+    }
+
 }

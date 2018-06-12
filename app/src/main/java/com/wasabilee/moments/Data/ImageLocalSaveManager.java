@@ -25,7 +25,7 @@ public class ImageLocalSaveManager {
      */
 
     public interface OnImageLocalSavedListener {
-        void onImageSavedLocally(String uri);
+        void onImageSavedLocally(ImageData imageData);
 
         void onError(int errorMessageResource);
     }
@@ -39,7 +39,7 @@ public class ImageLocalSaveManager {
         return INSTANCE;
     }
 
-    public void saveImageInternalStorage(Context context, String fileName, byte[] data, OnImageLocalSavedListener listener) {
+    public void saveImageInternalStorage(Context context, ImageData imageData, byte[] data, OnImageLocalSavedListener listener) {
 
         //TODO Get permission
 
@@ -48,6 +48,7 @@ public class ImageLocalSaveManager {
             return;
         }
 
+        String fileName = imageData.getFileName();
         File directory = context.getFilesDir();
         File file = new File(directory, fileName);
 
@@ -70,7 +71,8 @@ public class ImageLocalSaveManager {
             }
         }
 
-        listener.onImageSavedLocally(Uri.fromFile(file).toString());
+        imageData.setSavedLocalUri(Uri.fromFile(file).toString());
+        listener.onImageSavedLocally(imageData);
         context = null;
     }
 
@@ -125,7 +127,7 @@ public class ImageLocalSaveManager {
             }
 
             executeMediaScan(context, savedImagePath);
-            listener.onImageSavedLocally(Uri.fromFile(imageFile).toString());
+            listener.onImageSavedLocally(new ImageData(Uri.fromFile(imageFile).toString()));
         }
 
         context = null;
@@ -133,10 +135,7 @@ public class ImageLocalSaveManager {
 
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     private void executeMediaScan(Context context, String imagePath) {

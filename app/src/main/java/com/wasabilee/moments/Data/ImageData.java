@@ -18,11 +18,16 @@ public class ImageData {
     public static final int ACTION_TYPE_DELETE = 1;
     public static final int ACTION_TYPE_DELETE_AND_UPLOAD = 2;
 
+
     public String getSavedLocalUri() {
         return savedLocalUri;
     }
 
     public void setSavedLocalUri(String savedLocalUri) {
+        this.savedLocalUri = savedLocalUri;
+    }
+
+    public ImageData(String savedLocalUri) {
         this.savedLocalUri = savedLocalUri;
     }
 

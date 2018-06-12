@@ -3,9 +3,6 @@ package com.wasabilee.moments.Data;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -14,9 +11,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.wasabilee.moments.Data.Models.Journal;
-import com.wasabilee.moments.Data.Models.JournalData;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +54,6 @@ public class JournalRemoteDataSource implements JournalDataSource {
                     if (task.isSuccessful()) {
                         List<Journal> result = getResultsInList(task);
                         callback.onJournalsLoaded(result);
-                        for (Journal journal :
-                                result) {
-                            Log.d(TAG, "getJournals: " + DateFormat.getInstance().format(journal.getTimestamp()));
-                        }
                     } else {
                         callback.onDataNotAvailable(task.getException().getMessage());
                     }
@@ -72,10 +63,7 @@ public class JournalRemoteDataSource implements JournalDataSource {
     private List<Journal> getResultsInList(Task<QuerySnapshot> task) {
         List<Journal> resultList = new ArrayList<>();
         for (QueryDocumentSnapshot document : task.getResult()) {
-            String docId = document.getId();
-            Journal journal = document.toObject(Journal.class);
-            journal.setJournalId(docId);
-            resultList.add(journal);
+            resultList.add(document.toObject(Journal.class));
         }
         return resultList;
     }
@@ -102,36 +90,36 @@ public class JournalRemoteDataSource implements JournalDataSource {
     }
 
     @Override
-    public void saveJournal(@NonNull Journal journal, @NonNull final UploadJournalCallback callback) {
-        if (journal.getJournalId() == null) {
-
-            // Adding new journal
-            mFirebaseFirestore.collection("Journal")
-                    .add(journal)
-                    .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "saveJournal: " + task.getResult().getId());
-                    callback.onJournalUploaded(task.getResult().getId());
-                } else {
-                    Log.d(TAG, "saveJournal: exception");
-                    task.getException().printStackTrace();
-                    callback.onError(task.getException().getMessage());
-                }
-            });
-
-        } else {
+    public void saveJournal(@NonNull Journal journal, @NonNull final JournalSaveCallback callback) {
+//        if (journal.getJournalId() == null) {
+//
+//            // Adding new journal
+//            mFirebaseFirestore.collection("Journal")
+//                    .add(journal)
+//                    .addOnCompleteListener(task -> {
+//                if (task.isSuccessful()) {
+//                    Log.d(TAG, "saveJournal: " + task.getResult().getId());
+//                    callback.onJournalSaved(task.getResult().getId());
+//                } else {
+//                    Log.d(TAG, "saveJournal: exception");
+//                    task.getException().printStackTrace();
+//                    callback.onError(task.getException().getMessage());
+//                }
+//            });
+//
+//        } else {
 
             // Updating existing journal
             mFirebaseFirestore.collection("Journal")
                     .document(journal.getJournalId())
                     .set(journal)
-                    .addOnSuccessListener(aVoid -> callback.onJournalUploaded(journal.getJournalId()))
+                    .addOnSuccessListener(aVoid -> callback.onJournalSaved(journal.getJournalId()))
                     .addOnFailureListener(e -> {
                         e.printStackTrace();
                         callback.onError(e.getMessage());
                     });
 
-        }
+//        }
     }
 
 

@@ -3,7 +3,6 @@ package com.wasabilee.moments.Data;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -19,24 +18,27 @@ import java.util.UUID;
 import id.zelory.compressor.Compressor;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
 
 public class ImageUploadManager {
 
-    private static final String TAG = ImageUploadCallback.class.getSimpleName();
+    private static final String TAG = ImageUploadManager.class.getSimpleName();
 
-    public interface ImageUploadCallback {
-        void onImageUploaded(ImageData result);
+    public static final int SAVE_LOCATION_LOCAL = 3;
+    public static final int SAVE_LOCATION_CLOUD = 4;
+    public static final int SAVE_LOCATION_LOCAL_AND_CLOUD = 5;
+
+    public interface ImageSaveCallback {
+        void onImageSaved(ImageData result);
 
         void onError(String message);
 
-        void onImageUploadTasksCompleted();
+        void onImageSaveTasksCompleted();
+
+        void onImageLocalSaveTasksCompleted();
+
+        void onImageRemoteSaveTasksCompleted();
     }
 
     public interface ImageDeletionCallback {
@@ -65,29 +67,40 @@ public class ImageUploadManager {
     }
 
     @SuppressLint("CheckResult")
-    public void uploadImage(Context context, List<ImageData> imageDataList, final ImageUploadCallback imageUploadCallback) {
+    public void saveImage(Context context, List<ImageData> imageDataList, final ImageSaveCallback imageSaveCallback, int flag) {
 
         if (imageDataList == null || imageDataList.size() == 0) {
-            imageUploadCallback.onImageUploadTasksCompleted();
+            imageSaveCallback.onImageSaveTasksCompleted();
             return;
         }
 
         Observable.fromIterable(imageDataList)
-                .flatMap(imageData -> getImageUploadObservable(context, imageData))
+                .flatMap(imageData -> getImageSaveObservable(context, imageData, flag))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(imageUploadCallback::onImageUploaded,
+                .subscribe(imageSaveCallback::onImageSaved,
                         throwable -> {
                             throwable.printStackTrace();
-                            imageUploadCallback.onError(context.getString(R.string.unexpected_error));
+                            imageSaveCallback.onError(context.getString(R.string.unexpected_error));
                         },
-                        imageUploadCallback::onImageUploadTasksCompleted);
-
+                        () -> {
+                            switch (flag) {
+                                case SAVE_LOCATION_LOCAL:
+                                    imageSaveCallback.onImageLocalSaveTasksCompleted();
+                                    break;
+                                case SAVE_LOCATION_CLOUD:
+                                    imageSaveCallback.onImageRemoteSaveTasksCompleted();
+                                    break;
+                                default:
+                                    imageSaveCallback.onImageSaveTasksCompleted();
+                                    break;
+                            }
+                        });
     }
 
 
-    private Observable<ImageData> getImageUploadObservable(Context context, ImageData imageData) {
-        return Observable.create(emitter -> makeImageNetworkCall(emitter, context, imageData));
+    private Observable<ImageData> getImageSaveObservable(Context context, ImageData imageData, int flag) {
+        return Observable.create(emitter -> makeImageNetworkCall(emitter, context, imageData, flag));
     }
 
     private Observable<ImageData> getImageDeletionObservable(ImageData imageData) {
@@ -95,60 +108,83 @@ public class ImageUploadManager {
     }
 
 
-    @SuppressLint("CheckResult")
-    private void makeImageNetworkCall(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData) {
+    private void makeImageNetworkCall(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData, int flag) {
         if (imageData.getAction() == ImageData.ACTION_TYPE_DELETE) {
             deleteFromStorage(emitter, imageData);
         } else {
-            compressImage(emitter, context, imageData);
+            startImageSave(emitter, context, imageData, flag);
         }
     }
 
-    @SuppressLint("CheckResult")
-    private void compressImage(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData) {
+    private void startImageSave(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData, int flag) {
         final File imageToCompress = new File(imageData.getmUri().getPath());
-        if (imageToCompress == null) {
-            emitter.onError(new Throwable("Image Compression Error: Try again later. "));
-        }
 
         Bitmap imageToUpload = getCompressedFile(emitter, context, imageToCompress, imageData.isThumb());
         byte[] imageByteArr = getImageData(imageToUpload);
         imageData.setFileName(getFileName(imageData));
 
-        Observable<ImageData> uploadObservable = Observable.create(inner_emitter ->
-                uploadToStorage(inner_emitter, imageData, imageByteArr));
-        Observable<String> saveObservable = Observable.create(inner_emitter ->
-                downloadImage(inner_emitter, imageData.getFileName(), context, imageByteArr));
+        executeSave(emitter, context, imageData, imageByteArr, flag);
 
-        Observable<ImageData> combined = Observable.zip(uploadObservable, saveObservable,
-                (uploadedImageData, localUri) -> {
-                    uploadedImageData.setSavedLocalUri(localUri);
-                    Log.d(TAG, "compressImage: " + localUri);
-                    return uploadedImageData;
-                });
+    }
 
-        combined.subscribeOn(Schedulers.io())
+    @SuppressLint("CheckResult")
+    private void executeSave(ObservableEmitter<ImageData> emitter, Context context, ImageData imageData,
+                             byte[] imageByteArr, int flag) {
+
+        Observable<ImageData> observable = getObservableByTargetLocation(flag, context, imageData, imageByteArr);
+
+        observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(emitter::onNext,
                         emitter::onError,
                         emitter::onComplete);
 
-//        uploadToStorage(emitter, imageData, imageByteArr);
     }
+
+    private Observable<ImageData> getObservableByTargetLocation(int flag, Context context, ImageData imageData, byte[] imageByteArr) {
+
+        Observable<ImageData> uploadObservable =
+                Observable.create(inner_emitter ->
+                        uploadToCloudStorage(inner_emitter, imageData, imageByteArr));
+
+        Observable<ImageData> saveObservable =
+                Observable.create(inner_emitter ->
+                        saveToLocalStorage(inner_emitter, imageData, context, imageByteArr));
+
+        Observable<ImageData> combined =
+                Observable.zip(uploadObservable, saveObservable,
+                        (uploadedImageData, savedImageData) -> {
+                            uploadedImageData.setSavedLocalUri(savedImageData.getSavedLocalUri());
+                            return uploadedImageData;
+                        });
+
+
+        switch (flag) {
+            case SAVE_LOCATION_LOCAL:
+                return saveObservable;
+            case SAVE_LOCATION_CLOUD:
+                return uploadObservable;
+            case SAVE_LOCATION_LOCAL_AND_CLOUD:
+                return combined;
+            default:
+                return combined;
+        }
+    }
+
 
     private String getFileName(ImageData imageData) {
         return imageData.getAction() == ImageData.ACTION_TYPE_DELETE_AND_UPLOAD ?
                 imageData.getFileName() : UUID.randomUUID().toString();
     }
 
-    private void downloadImage(ObservableEmitter<String> emitter, String fileName, Context context, byte[] imageByteArr) {
+    private void saveToLocalStorage(ObservableEmitter<ImageData> emitter, ImageData imageData, Context context, byte[] imageByteArr) {
 
         ImageLocalSaveManager.getInstance()
-                .saveImageInternalStorage(context, fileName, imageByteArr,
+                .saveImageInternalStorage(context, imageData, imageByteArr,
                         new ImageLocalSaveManager.OnImageLocalSavedListener() {
                             @Override
-                            public void onImageSavedLocally(String uri) {
-                                emitter.onNext(uri);
+                            public void onImageSavedLocally(ImageData result) {
+                                emitter.onNext(result);
                                 emitter.onComplete();
                             }
 
@@ -161,7 +197,7 @@ public class ImageUploadManager {
 
     }
 
-    private Bitmap getCompressedFile(ObservableEmitter<ImageData> emitter, Context context, File imageToCompress, boolean isThumb) {
+    private static Bitmap getCompressedFile(ObservableEmitter<ImageData> emitter, Context context, File imageToCompress, boolean isThumb) {
         final int quality = isThumb ? 5 : 20;
         final int widthHeight = isThumb ? 200 : -1;
         try {
@@ -184,7 +220,7 @@ public class ImageUploadManager {
     }
 
 
-    private byte[] getImageData(Bitmap compressedImage) {
+    private static byte[] getImageData(Bitmap compressedImage) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         compressedImage.compress(Bitmap.CompressFormat.PNG, 100, baos);
         return baos.toByteArray();
@@ -211,19 +247,21 @@ public class ImageUploadManager {
 
     }
 
-    private void uploadToStorage(ObservableEmitter<ImageData> emitter, ImageData imageData, byte[] imageByteArr) {
+    private void uploadToCloudStorage(ObservableEmitter<ImageData> emitter, ImageData imageData, byte[] imageByteArr) {
         String fileName = imageData.getFileName();
         String filePath = imageData.isThumb() ? "journal_images/thumbnails" : "journal_images";
         StorageReference ref = mStorageReference.child(filePath).child(fileName + ".png");
         UploadTask uploadTask = ref.putBytes(imageByteArr);
 
         uploadTask.addOnSuccessListener(taskSnapshot ->
-                ref.getDownloadUrl().addOnSuccessListener(uri -> {
-                    final String downloadUrl = uri.toString();
-                    imageData.setDownloadUrl(downloadUrl);
-                    emitter.onNext(imageData);
-                    emitter.onComplete();
-                }).addOnFailureListener(e -> e.printStackTrace()))
+                ref.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            final String downloadUrl = uri.toString();
+                            imageData.setDownloadUrl(downloadUrl);
+                            emitter.onNext(imageData);
+                            emitter.onComplete();
+                        })
+                        .addOnFailureListener(Throwable::printStackTrace))
                 .addOnFailureListener(e -> {
                     final String errorMessage = e.getMessage();
                     emitter.onError(new Throwable(errorMessage));

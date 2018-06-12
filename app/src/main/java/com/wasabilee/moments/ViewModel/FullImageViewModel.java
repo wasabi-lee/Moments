@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.wasabilee.moments.Data.ImageData;
 import com.wasabilee.moments.Data.ImageLocalSaveManager;
 import com.wasabilee.moments.Data.JournalRepository;
 import com.wasabilee.moments.R;
@@ -67,7 +68,7 @@ public class FullImageViewModel extends AndroidViewModel implements ImageLocalSa
     }
 
     @Override
-    public void onImageSavedLocally(String uri) {
+    public void onImageSavedLocally(ImageData imageData) {
         mSnackbarResourceText.setValue(R.string.image_saved);
     }
 

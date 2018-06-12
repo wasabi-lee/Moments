@@ -1,43 +1,57 @@
 package com.wasabilee.moments.Data.Models;
 
-import android.databinding.InverseMethod;
-import android.util.Log;
-import android.widget.EditText;
+import android.support.annotation.NonNull;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.ServerTimestamp;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+@Entity(tableName = "journal")
 public class Journal extends JournalData {
 
     @Exclude
+    @Ignore
     private static final String TAG = Journal.class.getSimpleName();
 
     @Exclude
+    @Ignore
     public static final String TOPIC_1_DISPLAY_TEXT = "I Am Grateful For";
     @Exclude
+    @Ignore
     public static final String TOPIC_2_DISPLAY_TEXT = "What Will Make Today Amazing?";
     @Exclude
+    @Ignore
     public static final String TOPIC_3_DISPLAY_TEXT = "Affirmations";
     @Exclude
+    @Ignore
     public static final String TOPIC_4_DISPLAY_TEXT = "3 Amazing Things That Happened Today";
     @Exclude
+    @Ignore
     public static final String TOPIC_5_DISPLAY_TEXT = "What Could Make Today Better?";
 
 
     @Exclude
+    @Ignore
     public static final String IMAGE_IDENTIFIER_DAY = "day";
     @Exclude
+    @Ignore
     public static final String IMAGE_IDENTIFIER_DAY_THUMB = "day_thumb";
     @Exclude
+    @Ignore
     public static final String IMAGE_IDENTIFIER_NIGHT = "night";
     @Exclude
+    @Ignore
     public static final String IMAGE_IDENTIFIER_NIGHT_THUMB = "night_thumb";
 
     @Exclude
+    @PrimaryKey
+    @NonNull
     private String journalId;
 
     private String user_id;
@@ -86,11 +100,12 @@ public class Journal extends JournalData {
     private String topic_5_item_3;
 
 
-    public Journal() {
-    }
+    public Journal() {}
 
+    @Ignore
     public Journal(String user_id) {
         this.user_id = user_id;
+        this.journalId = UUID.randomUUID().toString();
     }
 
     @Override

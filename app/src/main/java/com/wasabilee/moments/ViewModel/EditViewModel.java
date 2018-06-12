@@ -40,7 +40,7 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class EditViewModel extends AndroidViewModel implements ImageUploadManager.ImageUploadCallback, NetworkChecker.NetworkCheckerCallback {
+public class EditViewModel extends AndroidViewModel implements ImageUploadManager.ImageSaveCallback, NetworkChecker.NetworkCheckerCallback {
 
     private static final String TAG = EditViewModel.class.getSimpleName();
 
@@ -370,17 +370,15 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
     }
 
 
-    private void uploadImages(Uri dayImageUri, Uri nightImageUri) {
+    private void uploadImages(Uri dayImageUri, Uri nightImageUri, int flag) {
 
         if (!isDayImageChanged && !isNightImageChanged) {
             uploadJournal();
             return;
         }
 
-        //TODO Save image in local storage
-
         List<ImageData> imageDataList = generateImageDataList(dayImageUri, nightImageUri);
-        ImageUploadManager.getInstance().uploadImage(mContext, imageDataList, this);
+        ImageUploadManager.getInstance().saveImage(mContext, imageDataList, this, flag);
 
     }
 
@@ -408,21 +406,24 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
 
 
     @Override
-    public void onImageUploaded(ImageData result) {
+    public void onImageSaved(ImageData result) {
         if (result.isDay()) {
             if (result.isThumb()) {
-                //TODO Save uri here
+                mJournal.setDay_image_thumbnail_local_uri(result.getSavedLocalUri());
                 mJournal.setDay_image_thumbnail_url(result.getDownloadUrl());
                 mJournal.setDay_image_thumbnail_file_name(result.getFileName());
             } else {
+                mJournal.setDay_image_local_uri(result.getSavedLocalUri());
                 mJournal.setDay_image_url(result.getDownloadUrl());
                 mJournal.setDay_image_file_name(result.getFileName());
             }
         } else {
             if (result.isThumb()) {
+                mJournal.setNight_image_thumbnail_local_uri(result.getSavedLocalUri());
                 mJournal.setNight_image_thumbnail_url(result.getDownloadUrl());
                 mJournal.setNight_image_thumbnail_file_name(result.getFileName());
             } else {
+                mJournal.setNight_image_local_uri(result.getSavedLocalUri());
                 mJournal.setNight_image_url(result.getDownloadUrl());
                 mJournal.setNight_image_file_name(result.getFileName());
             }
@@ -436,27 +437,63 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
     }
 
     @Override
-    public void onImageUploadTasksCompleted() {
-        Log.d(TAG, "onImageUploadTasksCompleted: upload journal");
+    public void onImageSaveTasksCompleted() {
+        Log.d(TAG, "onImageSaveTasksCompleted: upload journal");
         uploadJournal();
+    }
+
+    @Override
+    public void onImageLocalSaveTasksCompleted() {
+        completeJournalData();
+        mJournalRepository.saveJournalLocally(mJournal, new JournalDataSource.JournalLocalSaveCallback() {
+            @Override
+            public void onJournalSavedLocal(String journalId) {
+                Log.d(TAG, "onJournalSavedLocal: " + journalId);
+                completeJournalData();
+                mJournalRepository.saveJournalLocally(mJournal, new JournalDataSource.JournalLocalSaveCallback() {
+                    @Override
+                    public void onJournalSavedLocal(String journalId) {
+                        mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_FAILED);
+                        mSnackbarTextResource.setValue(R.string.internet_unstable_upload);
+                    }
+
+                    @Override
+                    public void onError() {
+                        mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_FAILED);
+                        mSnackbarTextResource.setValue(R.string.unexpected_error);
+                    }
+                });
+            }
+
+            @Override
+            public void onError() {
+                mSnackbarTextResource.setValue(R.string.internet_unstable_upload);
+                mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_FAILED);
+            }
+        });
+    }
+
+    @Override
+    public void onImageRemoteSaveTasksCompleted() {
+        /* empty */
     }
 
     private void uploadJournal() {
         completeJournalData();
-        mJournalRepository.saveJournal(mJournal, new JournalDataSource.UploadJournalCallback() {
-            @Override
-            public void onJournalUploaded(String journalId) {
-                mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_SUCCESSFUL);
-                mSnackbarTextResource.setValue(R.string.journal_update_completed);
-            }
+            mJournalRepository.saveJournal(mJournal, new JournalDataSource.JournalSaveCallback() {
+                @Override
+                public void onJournalSaved(String journalId) {
+                    mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_SUCCESSFUL);
+                    mSnackbarTextResource.setValue(R.string.journal_update_completed);
+                }
 
-            @Override
-            public void onError(String message) {
-                mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_FAILED);
-                mSnackbarTextResource.setValue(R.string.unexpected_error);
+                @Override
+                public void onError(String message) {
+                    mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_FAILED);
+                    mSnackbarTextResource.setValue(R.string.unexpected_error);
+                }
+            });
             }
-        });
-    }
 
     private void completeJournalData() {
         mJournal.setTimestamp(Calendar.getInstance().getTime());
@@ -502,16 +539,13 @@ public class EditViewModel extends AndroidViewModel implements ImageUploadManage
     @Override
     public void onNetworkCheckCompleted(boolean isAvailable) {
 
-        // Dismiss the progress dialog / Show snackbar text
         if (!isAvailable) {
-            mJournalUploadCompleted.setValue(JournalUploadTaskNavigator.UPLOAD_UNSTABLE_CONNECTION);
-            mSnackbarTextResource.setValue(R.string.internet_unstable_upload);
-
-            //TODO Save this journal as draft.
-
+            // Unstable connection. Save the image in local storage only.
+            uploadImages(mDayImageUri.get(), mNightImageUri.get(), ImageUploadManager.SAVE_LOCATION_LOCAL);
             return;
         }
         // Stable internet connection. Proceed the upload.
-        uploadImages(mDayImageUri.get(), mNightImageUri.get());
+        uploadImages(mDayImageUri.get(), mNightImageUri.get(), ImageUploadManager.SAVE_LOCATION_LOCAL_AND_CLOUD);
     }
+
 }
