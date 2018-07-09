@@ -131,6 +131,7 @@ public class DetailViewModel extends AndroidViewModel implements JournalDataSour
     public void onJournalLoaded(Journal journal) {
         mJournalLoadTaskNavigator.setValue(JournalLoadTaskNavigator.LOAD_SUCCESSFUL);
         mJournal.set(journal);
+        mJournal.notifyChange();
     }
 
     @Override
