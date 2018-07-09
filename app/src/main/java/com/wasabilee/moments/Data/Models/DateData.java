@@ -6,6 +6,8 @@ import java.util.Date;
 
 public class DateData extends JournalData {
 
+    private static final String TAG = DateData.class.getSimpleName();
+
     public static final int MONTHLY_FORMAT = 0; // FOR LIST HEADER (i.e. JUL 2018)
     public static final int DAILY_FORMAT = 1; // FOR EACH JOURNALS (i.e. JUL 4, 2018)
     public static final int TIME_FORMAT = 2; // FOR THE EXACT TIME (Locale default format)
