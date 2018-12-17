@@ -10,14 +10,14 @@
 
         <variable
             name="viewmodel"
-            type="com.wasabilee.moments.ViewModel.MainViewModel" />
+            type="com.wasabilee.moments.viewmodel.MainViewModel" />
 
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Activity.MainActivity">
+        tools:context=".activity.MainActivity">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/main_appbar_layout"

@@ -10,7 +10,7 @@
 
         <variable
             name="viewmodel"
-            type="com.wasabilee.moments.ViewModel.DetailViewModel" />
+            type="com.wasabilee.moments.viewmodel.DetailViewModel" />
 
     </data>
 

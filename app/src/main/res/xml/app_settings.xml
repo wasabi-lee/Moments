@@ -29,7 +29,7 @@
             android:summaryOn="On"
             android:title="@string/settings_item_title_enable_morning_notification" />
 
-        <com.wasabilee.moments.Preference.TimePreference
+        <com.wasabilee.moments.preference.TimePreference
             android:key="@string/settings_item_key_morning_notif_time"
             android:title="@string/settings_item_title_morning_notif_time"
             android:summary="Set the morning journal notification time"
@@ -43,7 +43,7 @@
             android:summaryOn="On"
             android:title="@string/settings_item_title_enable_night_notification" />
 
-        <com.wasabilee.moments.Preference.TimePreference
+        <com.wasabilee.moments.preference.TimePreference
             android:key="@string/settings_item_key_night_notif_time"
             android:title="@string/settings_item_title_night_notif_time"
             android:summary="Set the night journal notification time"

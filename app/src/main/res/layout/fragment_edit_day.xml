@@ -10,13 +10,13 @@
 
         <variable
             name="viewmodel"
-            type="com.wasabilee.moments.ViewModel.EditViewModel" />
+            type="com.wasabilee.moments.viewmodel.EditViewModel" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Fragment.EditDayFragment">
+        tools:context=".fragment.EditDayFragment">
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"

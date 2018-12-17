@@ -8,14 +8,14 @@
 
         <variable
             name="viewmodel"
-            type="com.wasabilee.moments.ViewModel.FullImageViewModel" />
+            type="com.wasabilee.moments.viewmodel.FullImageViewModel" />
 
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Activity.FullImageActivity">
+        tools:context=".activity.FullImageActivity">
 
         <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/full_image_view"

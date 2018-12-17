@@ -8,13 +8,13 @@
 
         <variable
             name="viewmodel"
-            type="com.wasabilee.moments.ViewModel.EditViewModel" />
+            type="com.wasabilee.moments.viewmodel.EditViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Activity.EditActivity">
+        tools:context=".activity.EditActivity">
 
 
         <android.support.design.widget.AppBarLayout

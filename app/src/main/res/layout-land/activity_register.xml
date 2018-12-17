@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:isScrollContainer="true"
-    tools:context=".Activity.RegisterActivity">
+    tools:context=".activity.RegisterActivity">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

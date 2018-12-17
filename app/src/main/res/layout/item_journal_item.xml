@@ -10,13 +10,13 @@
 
         <variable
             name="journal"
-            type="com.wasabilee.moments.Data.Models.Journal" />
+            type="com.wasabilee.moments.data.models.Journal" />
         <variable
             name="journalDisplayItem"
-            type="com.wasabilee.moments.Data.Models.JournalListDisplayItem" />
+            type="com.wasabilee.moments.data.models.JournalListDisplayItem" />
         <variable
             name="listener"
-            type="com.wasabilee.moments.Utils.JournalItemActionsListener" />
+            type="com.wasabilee.moments.utils.JournalItemActionsListener" />
 
     </data>
 

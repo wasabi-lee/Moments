@@ -8,7 +8,7 @@
 
         <variable
             name="date"
-            type="com.wasabilee.moments.Data.Models.DateData" />
+            type="com.wasabilee.moments.data.models.DateData" />
 
     </data>
 

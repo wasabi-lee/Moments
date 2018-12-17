@@ -11,7 +11,7 @@
 
         <variable
             name="viewmodel"
-            type="com.wasabilee.moments.ViewModel.EditViewModel" />
+            type="com.wasabilee.moments.viewmodel.EditViewModel" />
 
 
     </data>
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/window_default_night_background_light"
-        tools:context=".Fragment.EditNightFragment">
+        tools:context=".fragment.EditNightFragment">
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
